@@ -27,6 +27,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'recipe.apps.RecipeConfig',
+    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -76,6 +77,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'users.FGUser'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
