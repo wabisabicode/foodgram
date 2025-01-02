@@ -1,4 +1,7 @@
 from django.db import models
+from django.core.validators import MinValueValidator
+
+from .constants import MIN_COOKING_TIME
 
 
 class Ingredient(models.Model):
@@ -21,6 +24,42 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+
+    def __str__(self):
+        return self.name
+
+
+class Recipe(models.Model):
+    name = models.CharField(max_length=256, verbose_name='Название')
+    image = models.ImageField(upload_to='recipes/images', null=True)
+    text = models.TextField(verbose_name='Текст')
+    cooking_time = models.IntegerField(
+        verbose_name='Время приготовления',
+        validators=MinValueValidator(MIN_COOKING_TIME))
+    author = models.SlugField()  # change to Foreign Key with FGUser
+    is_favorited = models.ManyToManyField(
+        FGUser, through='RecipeIsFavorited', verbose_name='В избранном')
+    is_in_shopping_cart = models.ManyToManyField(
+        FGUser, through='RecipeIsInCart', verbose_name='В списке покупок')
+
+    tags = models.ManyToManyField(
+        Tag,
+        through='RecipeTag',
+        verbose_name='Тег'
+    )
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        through='RecipeIngredient',
+        verbose_name='Ингредиент'
+    )
+
+    pub_date = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата публикации')
+
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+        ordering = ('pub_date',)
 
     def __str__(self):
         return self.name
