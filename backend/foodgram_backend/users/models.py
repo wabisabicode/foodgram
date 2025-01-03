@@ -3,11 +3,14 @@ from django.db import models
 
 
 class FGUser(AbstractUser):
-    email = models.EmailField(max_length=254, required=True)
-    first_name = models.CharField(max_length=150, required=True)
-    last_name = models.CharField(max_length=150, required=True)
+    email = models.EmailField(max_length=254)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
 
     username = models.CharField(unique=True, max_length=150)
+
+    is_subscribed = models.BooleanField()
+    avatar = models.ImageField(upload_to='users/avatars')
 
     class Meta:
         verbose_name = 'Пользователь'
