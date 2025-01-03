@@ -3,13 +3,13 @@ from django.db import models
 
 
 class FGUser(AbstractUser):
-    email = models.EmailField(max_length=254)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
+    email = models.EmailField(max_length=254, blank=False)
+    first_name = models.CharField(max_length=150, blank=False)
+    last_name = models.CharField(max_length=150, blank=False)
 
     username = models.CharField(unique=True, max_length=150)
 
-    is_subscribed = models.BooleanField()
+    # is_subscribed = models.BooleanField()
     avatar = models.ImageField(upload_to='users/avatars')
 
     class Meta:
