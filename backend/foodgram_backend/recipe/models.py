@@ -34,16 +34,19 @@ class Tag(models.Model):
 
 class Recipe(models.Model):
     name = models.CharField(max_length=256, verbose_name='Название')
-    image = models.ImageField(upload_to='recipes/images', null=True)
+    image = models.ImageField(upload_to='recipes/images', verbose_name='Изображение')
     text = models.TextField(verbose_name='Текст')
     cooking_time = models.IntegerField(
         verbose_name='Время приготовления',
         validators=MinValueValidator(MIN_COOKING_TIME))
     author = models.SlugField()  # change to Foreign Key with FGUser
-    is_favorited = models.ManyToManyField(
-        User, through='RecipeIsFavorited', verbose_name='В избранном')
-    is_in_shopping_cart = models.ManyToManyField(
-        User, through='RecipeIsInCart', verbose_name='В списке покупок')
+    # Looks like dynamic properties, i.e. to handle through Many-to-Many deps
+    # is_favorited = models.ManyToManyField(
+    #     User, through='RecipeIsFavorited', verbose_name='В избранном')
+
+    # Through ShoppingCartItem and, possibly, ShoppingCart models
+    # is_in_shopping_cart = models.ManyToManyField(
+    #     User, through='RecipeIsInCart', verbose_name='В списке покупок')
 
     tags = models.ManyToManyField(
         Tag,
