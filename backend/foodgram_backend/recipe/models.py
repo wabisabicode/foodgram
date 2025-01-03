@@ -1,7 +1,10 @@
-from django.db import models
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
+from django.db import models
 
 from .constants import MIN_COOKING_TIME
+
+User = get_user_model()
 
 
 class Ingredient(models.Model):
@@ -38,9 +41,9 @@ class Recipe(models.Model):
         validators=MinValueValidator(MIN_COOKING_TIME))
     author = models.SlugField()  # change to Foreign Key with FGUser
     is_favorited = models.ManyToManyField(
-        FGUser, through='RecipeIsFavorited', verbose_name='В избранном')
+        User, through='RecipeIsFavorited', verbose_name='В избранном')
     is_in_shopping_cart = models.ManyToManyField(
-        FGUser, through='RecipeIsInCart', verbose_name='В списке покупок')
+        User, through='RecipeIsInCart', verbose_name='В списке покупок')
 
     tags = models.ManyToManyField(
         Tag,
