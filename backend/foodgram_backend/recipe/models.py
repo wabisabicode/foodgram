@@ -80,3 +80,14 @@ class RecipeTag(models.Model):
     class Meta:
         verbose_name = 'Связь рецепта и тега'
         verbose_name_plural = 'Связи рецепта и тега'
+
+
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(
+        'Recipe', verbose_name='Рецепт', on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(
+        'Ingredient', verbose_name='Ингредиент', on_delete=models.SET_NULL)
+
+    class Meta:
+        verbose_name = 'Связь рецепта и ингредиента'
+        verbose_name_plural = 'Связи рецепта и ингредиента'
