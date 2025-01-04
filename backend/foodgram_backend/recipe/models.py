@@ -75,7 +75,7 @@ class RecipeTag(models.Model):
     recipe = models.ForeignKey(
         'Recipe', verbose_name='Рецепт', on_delete=models.CASCADE)
     tag = models.ForeignKey(
-        'Tag', verbose_name='Тег', on_delete=models.CASCADE)
+        'Tag', verbose_name='Тег', on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = 'Связь рецепта и тега'
