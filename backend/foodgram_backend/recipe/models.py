@@ -38,7 +38,7 @@ class Recipe(models.Model):
     text = models.TextField(verbose_name='Текст')
     cooking_time = models.IntegerField(
         verbose_name='Время приготовления',
-        validators=MinValueValidator(MIN_COOKING_TIME))
+        validators=[MinValueValidator(MIN_COOKING_TIME)])
     author = models.SlugField()  # change to Foreign Key with FGUser
     # Looks like dynamic properties, i.e. to handle through Many-to-Many deps
     # is_favorited = models.ManyToManyField(
