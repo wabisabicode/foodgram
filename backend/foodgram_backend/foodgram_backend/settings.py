@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'recipe.apps.RecipeConfig',
     'users.apps.UsersConfig',
     'api.apps.ApiConfig',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
