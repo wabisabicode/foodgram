@@ -19,3 +19,10 @@ class FGUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class Subscription(models.Model):
+    subscriber = models.ForeignKey(
+        FGUser, related_name='following', on_delete=models.CASCADE)
+    creator = models.ForeignKey(
+        FGUser, related_name='subscribers', on_delete=models.CASCADE)
