@@ -31,6 +31,8 @@ class TokenCreateSerializer(serializers.Serializer):
     password = serializers.CharField(
         required=True, style={'input_type': 'password'})
 
+    class Meta:
+        fields = ('email', 'password')
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
     #     self.user = None
