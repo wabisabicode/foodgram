@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
-from .views import UserViewSet
+from .views import UserViewSet, MeViewSet
 
 app_name = 'api'
 
@@ -13,7 +13,7 @@ urlpatterns = [
     path('', include(router_v1.urls)),
     # path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
-    # path('users/me/', MeView.as_view(), name='users-me'),
+    path('users/me/', MeViewSet, name='users-me'),
     # path('users/me/avatar/', AvatarView.as_view(), name='users-avatar'),
     # path('users/set_password/', SetPasswordView.as_view(),
     #      name='user-set-password'),
