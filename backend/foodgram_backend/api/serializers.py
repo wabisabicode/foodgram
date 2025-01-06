@@ -8,7 +8,7 @@ User = get_user_model()
 
 class CustomUserCreateSerializer(UserCreateSerializer):
     username = serializers.RegexField(
-        regex=r'^[\w.@+-]+$',
+        regex=r'^[\w.@+-]+\Z',
         max_length=150,
         required=True,
         validators=(
