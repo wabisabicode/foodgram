@@ -56,6 +56,12 @@ class CustomUserSerializer(UserSerializer):
                   'first_name', 'last_name', 'avatar')
 
 
+class SetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(
+        required=True, style={'input_type': 'password'})
+    current_password = serializers.CharField(
+        required=True, style={'input_type': 'password'})
+
 # class TokenSerializer(serializer):
 #     class Meta:
 #         model = User
@@ -67,7 +73,7 @@ class TokenCreateSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=254, required=True)
     password = serializers.CharField(
         required=True, style={'input_type': 'password'})
-    
+
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
     #     self.user = None

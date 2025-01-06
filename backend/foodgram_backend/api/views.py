@@ -10,7 +10,7 @@ from rest_framework.viewsets import ModelViewSet
 from django.shortcuts import get_object_or_404
 
 from .serializers import CustomUserSerializer, CustomUserCreateSerializer
-from .serializers import TokenCreateSerializer
+from .serializers import SetPasswordSerializer, TokenCreateSerializer
 
 User = get_user_model()
 
@@ -53,6 +53,27 @@ class MeViewSet(ModelViewSet):
     #     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class SetPasswordView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        print("SetPasswordView POST called")
+        serializer = SetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        new_password = serializer.validated_data.get('new_password')
+        current_password = serializer.validated_data.get('current_password')
+
+        user = request.user
+
+        if not user.check_password(current_password):
+            raise AuthenticationFailed('Invalid credentials')
+        else:
+            user.set_password(new_password)
+
+        return Response('Password has been changed', status=status.HTTP_200_OK)
+
+
 class TokenCreateView(APIView):
 
     def post(self, request):
@@ -65,7 +86,7 @@ class TokenCreateView(APIView):
         user = get_object_or_404(User, email=email)
 
         if not user.check_password(password):
-            raise AuthenticationFailed('Invalid credentialsss')
+            raise AuthenticationFailed('Invalid credentials')
 
         token, created = Token.objects.get_or_create(user=user)
 
