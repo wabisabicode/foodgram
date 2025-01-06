@@ -65,7 +65,6 @@ class TokenCreateView(APIView):
 
         user = get_object_or_404(User, email=email)
 
-
         # user = authenticate(request, email=email, password=password)
         # print(user)
         # if user is None:
@@ -76,4 +75,4 @@ class TokenCreateView(APIView):
         # token = Token.objects.create(user=user)
         token, created = Token.objects.get_or_create(user=user)
 
-        return Response({'token': str(token)}, status=status.HTTP_200_OK)
+        return Response({'auth_token': str(token)}, status=status.HTTP_200_OK)
