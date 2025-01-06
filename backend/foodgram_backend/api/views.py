@@ -30,11 +30,12 @@ class UserViewSet(ModelViewSet):
 class MeViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer = CustomUserSerializer
-#    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     http_method_names = ['get']
 
-    def get(self, request):
-        user = request.user
+    def get(self):
+        print('Get-Request to ME')
+        user = self.request.user
         serializer = CustomUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -70,6 +71,7 @@ class SetPasswordView(APIView):
             raise AuthenticationFailed('Invalid credentials')
         else:
             user.set_password(new_password)
+            user.save()
 
         return Response('Password has been changed', status=status.HTTP_200_OK)
 
