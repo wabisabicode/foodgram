@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import AuthenticationFailed
@@ -7,7 +7,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-# from djoser.serializers import TokenSerializer
 from django.shortcuts import get_object_or_404
 
 from .serializers import CustomUserSerializer, CustomUserCreateSerializer
@@ -65,14 +64,9 @@ class TokenCreateView(APIView):
 
         user = get_object_or_404(User, email=email)
 
-        # user = authenticate(request, email=email, password=password)
-        # print(user)
-        # if user is None:
-        # if user.password != password:
         if not user.check_password(password):
             raise AuthenticationFailed('Invalid credentialsss')
 
-        # token = Token.objects.create(user=user)
         token, created = Token.objects.get_or_create(user=user)
 
         return Response({'auth_token': str(token)}, status=status.HTTP_200_OK)
