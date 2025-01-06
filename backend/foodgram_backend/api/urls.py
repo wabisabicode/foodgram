@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
-from .views import UserViewSet, MeViewSet, TokenCreateView
+from .views import UserViewSet, MeViewSet, TokenCreateView, TokenLogoutView
 
 app_name = 'api'
 
@@ -18,5 +18,6 @@ urlpatterns = [
     # path('users/set_password/', SetPasswordView.as_view(),
     #      name='user-set-password'),
     path('auth/token/login/', TokenCreateView.as_view(), name='token-login'),
-    # path('auth/token/logout/', TokenLogoutView.as_view(), name='token-logout'),
+    # path('auth/token/logout/', include('djoser.urls.authtoken')),
+    path('auth/token/logout/', TokenLogoutView.as_view(), name='token-logout'),
 ]
