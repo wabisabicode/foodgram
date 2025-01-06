@@ -63,11 +63,11 @@ class TokenCreateView(APIView):
         email = serializer.validated_data.get('email')
         password = serializer.validated_data.get('password')
 
-        user = get_object_or_404(User, email=email)
-        # user = authenticate(request, email=email, password=password)
-
-        # if user is None:
-        if user.password != password:
+        #user = get_object_or_404(User, email=email)
+        user = authenticate(request, email=email, password=password)
+        print(user)
+        if user is None:
+        # if user.password != password:
             raise AuthenticationFailed('Invalid credentialsss')
 
         # token = Token.objects.create(user=user)
