@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 
 from .serializers import CustomUserSerializer, CustomUserCreateSerializer
 from .serializers import SetPasswordSerializer, TokenCreateSerializer
+from .serializers import AvatarSerializer
 
 User = get_user_model()
 
@@ -103,3 +104,18 @@ class TokenLogoutView(APIView):
         token.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AvatarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        serializer = AvatarSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+
+        user.avatar = serializer.validated_data.get('avatar')
+        user.save()
+
+        return Response('Updated avatar', status=status.HTTP_200_OK)
