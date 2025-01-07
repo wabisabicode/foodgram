@@ -119,3 +119,10 @@ class AvatarView(APIView):
         user.save()
 
         return Response('Updated avatar', status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        user = request.user
+
+        user.avatar.delete()
+        user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
