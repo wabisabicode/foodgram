@@ -2,6 +2,7 @@ version: '3.3'
 
 volumes:
   media:
+    name: media
 
 services:
   backend:
