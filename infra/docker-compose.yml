@@ -8,7 +8,8 @@ services:
     container_name: foodgram-back
     build: ../backend
     env_file: .env
-    volumes: media:/app/media
+    volumes: 
+      - media:/app/media
   frontend:
     container_name: foodgram-front
     build: ../frontend
