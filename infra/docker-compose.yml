@@ -9,7 +9,7 @@ services:
   backend:
     container_name: foodgram-back
     build: ../backend
-    env_file: .env
+    env_file: ../backend/.env
     volumes: 
       - media:/app/foodgram_backend/media
       - static:/backend_static
