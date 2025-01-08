@@ -7,6 +7,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from common.help_functions import generate_random_filename
+from recipe.models import Tag, Ingredient
 
 User = get_user_model()
 
@@ -96,3 +97,15 @@ class AvatarSerializer(serializers.Serializer):
         if obj.avatar:
             return obj.avatar.url
         return None
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = '__all__'

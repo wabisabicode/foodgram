@@ -1,22 +1,22 @@
 from django.contrib.auth import get_user_model
-from rest_framework import status
+from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
 from django.shortcuts import get_object_or_404
 
 from .serializers import CustomUserSerializer, CustomUserCreateSerializer
 from .serializers import SetPasswordSerializer, TokenCreateSerializer
-from .serializers import AvatarSerializer
+from .serializers import AvatarSerializer, TagSerializer, IngredientSerializer
+from recipe.models import Tag, Ingredient
 
 User = get_user_model()
 
 
-class UserViewSet(ModelViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     pagination_class = PageNumberPagination
@@ -126,3 +126,17 @@ class AvatarView(APIView):
         user.avatar.delete()
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TagListRetrieveViewSet(mixins.ListModelMixin,
+                             mixins.RetrieveModelMixin,
+                             viewsets.GenericViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+
+class IngredientListRetrieveViewSet(mixins.ListModelMixin,
+                                    mixins.RetrieveModelMixin,
+                                    viewsets.GenericViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
