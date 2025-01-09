@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import AuthenticationFailed
@@ -6,7 +8,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
 
 from .serializers import CustomUserSerializer, CustomUserCreateSerializer
 from .serializers import SetPasswordSerializer, TokenCreateSerializer
@@ -140,5 +141,7 @@ class IngredientListRetrieveViewSet(mixins.ListModelMixin,
                                     viewsets.GenericViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filterset_fields = ('name',)
     search_fields = ('^name',)
+    pagination_class = None
