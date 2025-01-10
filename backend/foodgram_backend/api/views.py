@@ -12,8 +12,8 @@ from rest_framework.views import APIView
 from .serializers import CustomUserSerializer, CustomUserCreateSerializer
 from .serializers import SetPasswordSerializer, TokenCreateSerializer
 from .serializers import AvatarSerializer, TagSerializer, IngredientSerializer
-from .serializers import RecipeSerializer
-from recipe.models import Tag, Ingredient, Recipe
+from .serializers import RecipeSerializer, FavoriteSerializer
+from recipe.models import Tag, Ingredient, Recipe, Favorite
 
 User = get_user_model()
 
@@ -156,3 +156,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         # 'is_favorited', 'is_in_shopping_cart',
         'author', 'tags')
     pagination_class = PageNumberPagination
+
+
+class FavoriteViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteSerializer
