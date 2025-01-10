@@ -130,6 +130,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         return Favorite.objects.filter(user=request.user, recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
+        request = self.context.get('request')
+        if not request.user.is_authenticated:
+            return False
+        # TODO: change to real shopping cart test
         return False
 
     def create(self, validated_data):
