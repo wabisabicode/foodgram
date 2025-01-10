@@ -93,3 +93,8 @@ class RecipeIngredient(models.Model):
     class Meta:
         verbose_name = 'Связь рецепта и ингредиента'
         verbose_name_plural = 'Связи рецепта и ингредиента'
+
+
+class Favorite(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    user = models.ForeignKey(FGUser, on_delete=models.CASCADE)
