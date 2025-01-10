@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from .views import AvatarView, UserViewSet, MeView, SetPasswordView, TokenCreateView, TokenLogoutView
-from .views import TagListRetrieveViewSet, IngredientListRetrieveViewSet, RecipeViewSet
+from .views import TagListRetrieveViewSet, IngredientListRetrieveViewSet, RecipeViewSet, FavoriteViewSet
 
 app_name = 'api'
 
@@ -20,5 +20,6 @@ urlpatterns = [
     path('users/set_password/', SetPasswordView.as_view(), name='set-password'),
     path('auth/token/login/', TokenCreateView.as_view(), name='token-login'),
     path('auth/token/logout/', TokenLogoutView.as_view(), name='token-logout'),
+    path('recipes/<int:pk>/favorite/', FavoriteViewSet, name='favorite'),
     path('', include(router_v1.urls)),
 ]
