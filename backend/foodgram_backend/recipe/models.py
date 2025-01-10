@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 from common.constants import MIN_COOKING_TIME
+from users.models import FGUser
 
 User = get_user_model()
 
@@ -39,7 +40,8 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(
         verbose_name='Время приготовления',
         validators=[MinValueValidator(MIN_COOKING_TIME)])
-    author = models.SlugField()  # change to Foreign Key with FGUser
+    author = models.ForeignKey(
+        FGUser, verbose_name='Автор', on_delete=models.CASCADE)
     # Looks like dynamic properties, i.e. to handle through Many-to-Many deps
     # is_favorited = models.ManyToManyField(
     #     User, through='RecipeIsFavorited', verbose_name='В избранном')
