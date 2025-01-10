@@ -7,7 +7,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from common.help_functions import generate_random_filename
-from recipe.models import Tag, Ingredient, Recipe
+from recipe.models import Tag, Ingredient, Recipe, Favorite
 
 User = get_user_model()
 
@@ -67,10 +67,16 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class CustomUserSerializer(UserSerializer):
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+
+    # TODO: change to the real subscription check
+    def get_is_subscribed(self, obj):
+        return False
+
     class Meta:
         model = User
         fields = ('email', 'id', 'username',
-                  'first_name', 'last_name', 'avatar')
+                  'first_name', 'last_name', 'avatar', 'is_subscribed')
 
 
 class SetPasswordSerializer(serializers.Serializer):
@@ -114,13 +120,28 @@ class IngredientSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
+    image = Base64ImageField(required=True, allow_null=True)
+    author = CustomUserSerializer(read_only=True)
 
     def get_is_favorited(self, obj):
-        return 0
+        request = self.context.get('request')
+        return Favorite.objects.filter(user=request.user, recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
-        return 0
+        return False
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        recipe = Recipe.objects.create(
+            **validated_data, author=request.user)
+        return recipe
 
     class Meta:
         model = Recipe
         exclude = ('pub_date',)
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = '__all__'
