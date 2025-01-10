@@ -7,7 +7,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from common.help_functions import generate_random_filename
-from recipe.models import Tag, Ingredient
+from recipe.models import Tag, Ingredient, Recipe
 
 User = get_user_model()
 
@@ -109,3 +109,18 @@ class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = '__all__'
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
+
+    def get_is_favorited(self, obj):
+        return 0
+
+    def get_is_in_shopping_cart(self, obj):
+        return 0
+
+    class Meta:
+        model = Recipe
+        exclude = ('pub_date',)

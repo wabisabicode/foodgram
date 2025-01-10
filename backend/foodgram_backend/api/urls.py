@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from .views import AvatarView, UserViewSet, MeView, SetPasswordView, TokenCreateView, TokenLogoutView
-from .views import TagListRetrieveViewSet, IngredientListRetrieveViewSet
+from .views import TagListRetrieveViewSet, IngredientListRetrieveViewSet, RecipeViewSet
 
 app_name = 'api'
 
@@ -12,6 +12,7 @@ router_v1.register('users', UserViewSet, basename='users')
 router_v1.register('tags', TagListRetrieveViewSet, basename='tags')
 router_v1.register(
     'ingredients', IngredientListRetrieveViewSet, basename='ingredients')
+router_v1.register('recipes', RecipeViewSet, basename='recipes')
 
 urlpatterns = [
     path('users/me/', MeView.as_view(), name='users-me'),

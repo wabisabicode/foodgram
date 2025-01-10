@@ -12,7 +12,8 @@ from rest_framework.views import APIView
 from .serializers import CustomUserSerializer, CustomUserCreateSerializer
 from .serializers import SetPasswordSerializer, TokenCreateSerializer
 from .serializers import AvatarSerializer, TagSerializer, IngredientSerializer
-from recipe.models import Tag, Ingredient
+from .serializers import RecipeSerializer
+from recipe.models import Tag, Ingredient, Recipe
 
 User = get_user_model()
 
@@ -145,3 +146,13 @@ class IngredientListRetrieveViewSet(mixins.ListModelMixin,
     filterset_fields = ('name',)
     search_fields = ('^name',)
     pagination_class = None
+
+
+class RecipeViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = (
+        # 'is_favorited', 'is_in_shopping_cart',
+        'author', 'tags')
+    pagination_class = PageNumberPagination
