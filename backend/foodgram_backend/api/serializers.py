@@ -156,6 +156,13 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         return recipe_ingredients_list
 
+    def validate(self, data):
+        ingredients = self.initial_data.get('ingredients')
+        if not ingredients:
+            raise serializers.ValidationError(
+                {"ingredients": "This field is required and cannot be empty."}
+            )
+
     def create(self, validated_data):
         tag_ids = self.initial_data.get('tags')
         ingredients_data = self.initial_data.get('ingredients')
