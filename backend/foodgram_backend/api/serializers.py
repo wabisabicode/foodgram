@@ -158,20 +158,45 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         return recipe_ingredients_list
 
+    # def validate_tags(self, value):
+    #     if not value:
+    #         raise serializers.ValidationError(
+    #             {'tags': 'This field is required and cannot be empty.'}
+    #         )
+    #     return value
+
     def validate(self, data):
         ingredients_data = self.initial_data.get('ingredients')
+        # ingredients_data = data.get('ingredients')
 
         if not ingredients_data:
             raise serializers.ValidationError(
                 {'ingredients': 'This field is required and cannot be empty.'}
             )
 
+        ingredient_id_list = []
         for ingredient_data in ingredients_data:
             ingredient_id = ingredient_data.get('id')
+
             if not ingredient_id or not Ingredient.objects.filter(id=ingredient_id).exists():
                 raise serializers.ValidationError(
                     {'ingredients': f'Ingredient with id {ingredient_id} does not exist'}
                 )
+
+            amount = ingredient_data.get('amount')
+            if amount <= 0:
+                raise serializers.ValidationError(
+                    {'ingredients': 'Ingredient amount should be more than 0'}
+                )
+
+            if ingredient_id not in ingredient_id_list:
+                ingredient_id_list.append(ingredient_id)
+            else:
+                raise serializers.ValidationError(
+                    {'ingredients': 'Ingredient should be provided only once'}
+                )
+
+        return data
 
     def create(self, validated_data):
         tag_ids = self.initial_data.get('tags')
