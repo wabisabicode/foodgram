@@ -6,7 +6,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.pagination import (
     LimitOffsetPagination, PageNumberPagination)
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import (
+    AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -161,6 +162,7 @@ class IngredientListRetrieveViewSet(mixins.ListModelMixin,
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = (
