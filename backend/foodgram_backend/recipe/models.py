@@ -89,6 +89,7 @@ class RecipeIngredient(models.Model):
         'Recipe', verbose_name='Рецепт', on_delete=models.CASCADE)
     ingredient = models.ForeignKey(
         'Ingredient', verbose_name='Ингредиент', on_delete=models.CASCADE)
+    amount = models.IntegerField(verbose_name='Количество в рецепте')
 
     class Meta:
         verbose_name = 'Связь рецепта и ингредиента'
