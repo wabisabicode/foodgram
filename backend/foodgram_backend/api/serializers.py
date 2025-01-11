@@ -8,6 +8,7 @@ from rest_framework.validators import UniqueValidator
 
 from common.help_functions import generate_random_filename
 from recipe.models import Tag, Ingredient, Recipe, Favorite
+from recipe.models import RecipeTag, RecipeIngredient
 
 User = get_user_model()
 
@@ -122,6 +123,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField(required=True, allow_null=True)
     author = CustomUserSerializer(read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
+    ingredients = IngredientSerializer(many=True, read_only=True)
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
@@ -137,9 +140,24 @@ class RecipeSerializer(serializers.ModelSerializer):
         return False
 
     def create(self, validated_data):
+        tag_ids = self.initial_data.get('tags')
+        ingredients_data = self.initial_data.get('ingredients')
+
         request = self.context.get('request')
         recipe = Recipe.objects.create(
             **validated_data, author=request.user)
+
+        for tag_id in tag_ids:
+            tag = Tag.objects.get(id=tag_id)
+            RecipeTag.objects.create(tag=tag, recipe=recipe)
+
+        for ingredient_obj in ingredients_data:
+            ingredient_id = ingredient_obj.get('id')
+            ingredient_amount = ingredient_obj.get('amount')
+            ingredient = Ingredient.objects.get(id=ingredient_id)
+            RecipeIngredient.objects.create(
+                ingredient=ingredient, recipe=recipe, amount=ingredient_amount)
+
         return recipe
 
     class Meta:

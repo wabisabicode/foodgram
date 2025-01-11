@@ -4,7 +4,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import (
+    LimitOffsetPagination, PageNumberPagination)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -155,7 +156,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_fields = (
         # 'is_favorited', 'is_in_shopping_cart',
         'author', 'tags')
-    pagination_class = PageNumberPagination
+    pagination_class = LimitOffsetPagination
 
 
 class FavoriteViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
