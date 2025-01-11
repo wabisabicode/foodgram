@@ -149,14 +149,24 @@ class IngredientListRetrieveViewSet(mixins.ListModelMixin,
     pagination_class = None
 
 
+# class ConditionalPagination(LimitOffsetPagination):
+#     def paginate_queryset(self, queryset, request, view=None):
+#         if request.query_params:
+#             return None
+#         return super().paginate_queryset(queryset, request, view)
+
+#     def get_paginated_response(self, data):
+#         return super().get_paginated_response(data)
+
+
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = (
         # 'is_favorited', 'is_in_shopping_cart',
-        'author', 'tags')
-    pagination_class = LimitOffsetPagination
+        'author', 'tags__slug')
+    pagination_class = LimitOffsetPagination  # ConditionalPagination
 
 
 class FavoriteViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
