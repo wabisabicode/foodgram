@@ -124,7 +124,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True, allow_null=True)
     author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
-    ingredients = IngredientSerializer(many=True, read_only=True)
+    ingredients = serializers.SerializerMethodField()
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
@@ -139,6 +139,22 @@ class RecipeSerializer(serializers.ModelSerializer):
         # TODO: change to real shopping cart test
         return False
 
+    def get_ingredients(self, obj):
+        recipe_ingredients = RecipeIngredient.objects.filter(recipe=obj)
+
+        recipe_ingredients_list = []
+        for ri in recipe_ingredients:
+            recipe_ingredients_list.append(
+                {
+                    'id': ri.ingredient.id,
+                    'name': ri.ingredient.name,
+                    'measurement_unit': ri.ingredient.measurement_unit,
+                    'amount': ri.amount,
+                }
+            )
+
+        return recipe_ingredients_list
+
     def create(self, validated_data):
         tag_ids = self.initial_data.get('tags')
         ingredients_data = self.initial_data.get('ingredients')
@@ -151,12 +167,13 @@ class RecipeSerializer(serializers.ModelSerializer):
             tag = Tag.objects.get(id=tag_id)
             RecipeTag.objects.create(tag=tag, recipe=recipe)
 
-        for ingredient_obj in ingredients_data:
-            ingredient_id = ingredient_obj.get('id')
-            ingredient_amount = ingredient_obj.get('amount')
-            ingredient = Ingredient.objects.get(id=ingredient_id)
+        for ingredient_data in ingredients_data:
+            ingredient = Ingredient.objects.get(id=ingredient_data.get('id'))
             RecipeIngredient.objects.create(
-                ingredient=ingredient, recipe=recipe, amount=ingredient_amount)
+                recipe=recipe,
+                ingredient=ingredient,
+                amount=ingredient_data.get('amount')
+            )
 
         return recipe
 
