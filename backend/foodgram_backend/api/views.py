@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.authtoken.models import Token
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.pagination import (
     LimitOffsetPagination, PageNumberPagination)
 from rest_framework.permissions import (
@@ -73,8 +73,8 @@ class SetPasswordView(APIView):
         user = request.user
 
         if not user.check_password(current_password):
-            raise AuthenticationFailed('Invalid credentials')
-        else:
+            raise ValidationError('Invalid current password')
+        else: # delete else and move the code below to the left? 
             user.set_password(new_password)
             user.save()
 
