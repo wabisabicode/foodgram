@@ -1,6 +1,8 @@
 import base64
 
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+# from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from djoser.serializers import UserSerializer, UserCreateSerializer
 from rest_framework import serializers
@@ -157,11 +159,19 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe_ingredients_list
 
     def validate(self, data):
-        ingredients = self.initial_data.get('ingredients')
-        if not ingredients:
+        ingredients_data = self.initial_data.get('ingredients')
+
+        if not ingredients_data:
             raise serializers.ValidationError(
-                {"ingredients": "This field is required and cannot be empty."}
+                {'ingredients': 'This field is required and cannot be empty.'}
             )
+
+        for ingredient_data in ingredients_data:
+            ingredient_id = ingredient_data.get('id')
+            if not ingredient_id or not Ingredient.objects.filter(id=ingredient_id).exists():
+                raise serializers.ValidationError(
+                    {'ingredients': f'Ingredient with id {ingredient_id} does not exist'}
+                )
 
     def create(self, validated_data):
         tag_ids = self.initial_data.get('tags')
@@ -176,7 +186,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             RecipeTag.objects.create(tag=tag, recipe=recipe)
 
         for ingredient_data in ingredients_data:
-            ingredient = Ingredient.objects.get(id=ingredient_data.get('id'))
+            ingredient = get_object_or_404(Ingredient, id=ingredient_data.get('id'))
+            # ingredient = Ingredient.objects.get(id=ingredient_data.get('id'))
             RecipeIngredient.objects.create(
                 recipe=recipe,
                 ingredient=ingredient,
