@@ -122,7 +122,9 @@ class AvatarView(APIView):
         user.avatar = serializer.validated_data.get('avatar')
         user.save()
 
-        return Response('Updated avatar', status=status.HTTP_200_OK)
+        avatar_url = serializer.get_avatar_url(user)
+
+        return Response({'avatar': avatar_url}, status=status.HTTP_200_OK)
 
     def delete(self, request):
         user = request.user
