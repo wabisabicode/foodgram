@@ -126,7 +126,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField(required=True, allow_null=True)
     author = CustomUserSerializer(read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
+    tags = serializers.SerializerMethodField()
     ingredients = serializers.SerializerMethodField()
 
     def get_is_favorited(self, obj):
@@ -141,6 +141,21 @@ class RecipeSerializer(serializers.ModelSerializer):
             return False
         # TODO: change to real shopping cart test
         return False
+
+    def get_tags(self, obj):
+        recipe_tags = RecipeTag.objects.filter(recipe=obj)
+
+        recipe_tags_list = []
+        for rt in recipe_tags:
+            recipe_tags_list.append(
+                {
+                    'id': rt.tag.id,
+                    'name': rt.tag.name,
+                    'slug': rt.tag.slug
+                }
+            )
+
+        return recipe_tags_list
 
     def get_ingredients(self, obj):
         recipe_ingredients = RecipeIngredient.objects.filter(recipe=obj)
@@ -158,16 +173,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         return recipe_ingredients_list
 
-    # def validate_tags(self, value):
-    #     if not value:
-    #         raise serializers.ValidationError(
-    #             {'tags': 'This field is required and cannot be empty.'}
-    #         )
-    #     return value
-
     def validate(self, data):
         ingredients_data = self.initial_data.get('ingredients')
-        # ingredients_data = data.get('ingredients')
 
         if not ingredients_data:
             raise serializers.ValidationError(
@@ -189,12 +196,33 @@ class RecipeSerializer(serializers.ModelSerializer):
                     {'ingredients': 'Ingredient amount should be more than 0'}
                 )
 
-            if ingredient_id not in ingredient_id_list:
-                ingredient_id_list.append(ingredient_id)
-            else:
+            if ingredient_id in ingredient_id_list:
                 raise serializers.ValidationError(
                     {'ingredients': 'Ingredient should be provided only once'}
                 )
+            else:
+                ingredient_id_list.append(ingredient_id)
+
+        tags_data = self.initial_data.get('tags')
+
+        if not tags_data:
+            raise serializers.ValidationError(
+                {'tags': 'This field is required and cannot be empty.'}
+            )
+
+        tags_id_list = []
+        for tag_id in tags_data:
+            if not Tag.objects.filter(id=tag_id).exists():
+                raise serializers.ValidationError(
+                    {'tags': f'Tag with id {tag_id} does not exist'}
+                )
+
+            if tag_id in tags_id_list:
+                raise serializers.ValidationError(
+                    {'tags': 'Tag should be provided only once'}
+                )
+            else:
+                tags_id_list.append(tag_id)
 
         return data
 
