@@ -115,6 +115,20 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TagIDSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+
+    def to_representation(self, instance):
+        return {'id': instance.id, 'name': instance.name, 'slug': instance.slug}
+
+    def to_internal_value(self, tag_id):
+        try:
+            return Tag.objects.get(id=tag_id)
+        except Tag.DoesNotExist:
+            raise serializers.ValidationError(
+                {'tags': f'Tag with id {tag_id} does not exist'})
+
+
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
@@ -126,7 +140,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField(required=True, allow_null=True)
     author = CustomUserSerializer(read_only=True)
-    tags = serializers.SerializerMethodField()
+    tags = TagIDSerializer(many=True)
     ingredients = serializers.SerializerMethodField()
 
     def get_is_favorited(self, obj):
@@ -141,21 +155,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             return False
         # TODO: change to real shopping cart test
         return False
-
-    def get_tags(self, obj):
-        recipe_tags = RecipeTag.objects.filter(recipe=obj)
-
-        recipe_tags_list = []
-        for rt in recipe_tags:
-            recipe_tags_list.append(
-                {
-                    'id': rt.tag.id,
-                    'name': rt.tag.name,
-                    'slug': rt.tag.slug
-                }
-            )
-
-        return recipe_tags_list
 
     def get_ingredients(self, obj):
         recipe_ingredients = RecipeIngredient.objects.filter(recipe=obj)
@@ -172,6 +171,28 @@ class RecipeSerializer(serializers.ModelSerializer):
             )
 
         return recipe_ingredients_list
+
+    def validate_tags(self, tags):
+        if not tags:
+            raise serializers.ValidationError(
+                {'tags': 'This field is required and cannot be empty.'}
+            )
+
+        tags_id_list = []
+        for tag in tags:
+            if not Tag.objects.filter(id=tag.id).exists():
+                raise serializers.ValidationError(
+                    {'tags': f'Tag with id {tag.id} does not exist'}
+                )
+
+            if tag.id in tags_id_list:
+                raise serializers.ValidationError(
+                    {'tags': 'Tag should be provided only once'}
+                )
+            else:
+                tags_id_list.append(tag.id)
+
+        return tags
 
     def validate(self, data):
         ingredients_data = self.initial_data.get('ingredients')
@@ -203,44 +224,21 @@ class RecipeSerializer(serializers.ModelSerializer):
             else:
                 ingredient_id_list.append(ingredient_id)
 
-        tags_data = self.initial_data.get('tags')
-
-        if not tags_data:
-            raise serializers.ValidationError(
-                {'tags': 'This field is required and cannot be empty.'}
-            )
-
-        tags_id_list = []
-        for tag_id in tags_data:
-            if not Tag.objects.filter(id=tag_id).exists():
-                raise serializers.ValidationError(
-                    {'tags': f'Tag with id {tag_id} does not exist'}
-                )
-
-            if tag_id in tags_id_list:
-                raise serializers.ValidationError(
-                    {'tags': 'Tag should be provided only once'}
-                )
-            else:
-                tags_id_list.append(tag_id)
-
         return data
 
     def create(self, validated_data):
-        tag_ids = self.initial_data.get('tags')
+        tags = validated_data.pop('tags')
         ingredients_data = self.initial_data.get('ingredients')
 
         request = self.context.get('request')
         recipe = Recipe.objects.create(
             **validated_data, author=request.user)
 
-        for tag_id in tag_ids:
-            tag = Tag.objects.get(id=tag_id)
+        for tag in tags:
             RecipeTag.objects.create(tag=tag, recipe=recipe)
 
         for ingredient_data in ingredients_data:
             ingredient = get_object_or_404(Ingredient, id=ingredient_data.get('id'))
-            # ingredient = Ingredient.objects.get(id=ingredient_data.get('id'))
             RecipeIngredient.objects.create(
                 recipe=recipe,
                 ingredient=ingredient,
