@@ -78,7 +78,7 @@ class SetPasswordView(APIView):
             user.set_password(new_password)
             user.save()
 
-        return Response('Password has been changed', status=status.HTTP_200_OK)
+        return Response('Password has been changed', status=status.HTTP_204_NO_CONTENT)
 
 
 class TokenCreateView(APIView):
