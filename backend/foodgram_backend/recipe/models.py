@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 from common.constants import MIN_COOKING_TIME
+from common.help_functions import generate_random_filename
 from users.models import FGUser
 
 User = get_user_model()
@@ -94,6 +95,16 @@ class RecipeIngredient(models.Model):
     class Meta:
         verbose_name = 'Связь рецепта и ингредиента'
         verbose_name_plural = 'Связи рецепта и ингредиента'
+
+
+class RecipeShortURL(models.Model):
+    recipe = models.ForeignKey(
+        'Recipe', verbose_name='Рецепт', on_delete=models.CASCADE)
+    hash = models.CharField(max_length=8, verbose_name='Хеш')
+
+    def generate_hash(self):
+        self.hash = generate_random_filename(length=8)
+        self.save()
 
 
 class Favorite(models.Model):
