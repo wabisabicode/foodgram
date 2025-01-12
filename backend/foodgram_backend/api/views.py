@@ -4,8 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
-from rest_framework.pagination import (
-    LimitOffsetPagination, PageNumberPagination)
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import (
     AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
@@ -164,11 +163,21 @@ class IngredientListRetrieveViewSet(mixins.ListModelMixin,
 #         return super().get_paginated_response(data)
 
 
+class SeveralTagsFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        tags = request.query_params.getlist('tags', [])
+
+        if tags:
+            return queryset.filter(tags__slug__in=tags)
+
+        return queryset
+
+
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrReadOnly, IsAuthenticatedOrReadOnly)
     serializer_class = RecipeSerializer
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (SeveralTagsFilterBackend,)
     filterset_fields = (
         # 'is_favorited', 'is_in_shopping_cart',
         'author', 'tags__slug')
