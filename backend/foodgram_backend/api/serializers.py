@@ -9,7 +9,7 @@ from rest_framework.validators import UniqueValidator
 
 from common.help_functions import generate_random_filename
 from recipe.models import Tag, Ingredient, Recipe, Favorite
-from recipe.models import RecipeTag, RecipeIngredient
+from recipe.models import RecipeTag, RecipeIngredient, RecipeShortURL
 
 User = get_user_model()
 
@@ -252,6 +252,9 @@ class RecipeSerializer(serializers.ModelSerializer):
                 amount=ingredient_data.get('amount')
             )
 
+        recipe_short_url = RecipeShortURL.objects.create(recipe=recipe)
+        recipe_short_url.generate_hash()
+
         return recipe
 
     def update(self, instance, validated_data):
@@ -289,6 +292,20 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         exclude = ('pub_date',)
+
+
+class RecipeShortURLSerializer(serializers.ModelSerializer):
+    short_link = serializers.SerializerMethodField()
+
+    def get_short_link(self, obj):
+        request = self.context.get('request')
+        base_path = request.build_absolute_uri('/')
+        short_url = f'{base_path}s/' + obj.hash
+        return short_url
+
+    class Meta:
+        model = RecipeShortURL
+        fields = ('short_link',)
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
