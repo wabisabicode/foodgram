@@ -247,6 +247,38 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         return recipe
 
+    def update(self, instance, validated_data):
+        # Take care of non-object fields
+        instance.name = validated_data.get('name', instance.name)
+        instance.image = validated_data.get('image', instance.image)
+        instance.text = validated_data.get('text', instance.text)
+        instance.author = validated_data.get('author', instance.author)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time)
+
+        # Tags is given by TagSerializer
+        try:
+            tags_data = validated_data.pop('tags')
+        except KeyError:
+            raise serializers.ValidationError(
+                {'tags': 'This field is required and cannot be empty.'})
+
+        tags_list = list(tags_data)
+        instance.tags.set(tags_list)
+
+        # Ingredients is a SerializerMethodField
+        ingredients_data = self.initial_data.get('ingredients')
+
+        ingredients_list = []
+        for ingredient_data in ingredients_data:
+            ingredient = get_object_or_404(
+                Ingredient, id=ingredient_data.get('id'))
+            ingredients_list.append(ingredient)
+        instance.ingredients.set(ingredients_list)
+
+        instance.save()
+        return instance
+
     class Meta:
         model = Recipe
         exclude = ('pub_date',)
