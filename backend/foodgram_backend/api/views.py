@@ -177,7 +177,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrReadOnly, IsAuthenticatedOrReadOnly)
     serializer_class = RecipeSerializer
-    filter_backends = (SeveralTagsFilterBackend,)
+    filter_backends = (DjangoFilterBackend, SeveralTagsFilterBackend)
     filterset_fields = (
         # 'is_favorited', 'is_in_shopping_cart',
         'author', 'tags__slug')
