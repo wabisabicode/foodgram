@@ -1,8 +1,10 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import (
@@ -15,7 +17,8 @@ from .serializers import CustomUserSerializer, CustomUserCreateSerializer
 from .serializers import SetPasswordSerializer, TokenCreateSerializer
 from .serializers import AvatarSerializer, TagSerializer, IngredientSerializer
 from .serializers import RecipeSerializer, FavoriteSerializer
-from recipe.models import Tag, Ingredient, Recipe, Favorite
+from .serializers import RecipeShortURLSerializer
+from recipe.models import Tag, Ingredient, Recipe, Favorite, RecipeShortURL
 
 User = get_user_model()
 
@@ -182,6 +185,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
         # 'is_favorited', 'is_in_shopping_cart',
         'author', 'tags__slug')
     pagination_class = LimitOffsetPagination  # ConditionalPagination
+
+    @action(detail=True, url_path='get-link')
+    def get_short_link(self, request, pk):
+        short_url = RecipeShortURL.objects.get(recipe__id=pk)
+
+        serializer = RecipeShortURLSerializer(
+            short_url, context={'request': request})
+
+        return Response(
+            {'short-link': serializer.data['short_link']},
+            status=status.HTTP_200_OK
+        )
+
+
+def shortURLRedirect(request, hash):
+    recipe_short_url = get_object_or_404(RecipeShortURL, hash=hash)
+    recipe_detail_url = reverse(
+        'api:recipes-detail', kwargs={'pk': recipe_short_url.recipe.pk})
+    return redirect(recipe_detail_url)
 
 
 class FavoriteViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
