@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
 from djoser.serializers import UserSerializer, UserCreateSerializer
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from common.help_functions import generate_random_filename
 from recipe.models import Tag, Ingredient, Recipe, Favorite
@@ -312,6 +312,13 @@ class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite
         fields = ('recipe',)
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=['user', 'recipe'],
+                message='This recipe is already in your favorites.'
+            )
+        ]
 
     def to_representation(self, instance):
         recipe = instance.recipe
