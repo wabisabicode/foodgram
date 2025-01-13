@@ -166,12 +166,19 @@ class IngredientListRetrieveViewSet(mixins.ListModelMixin,
 #         return super().get_paginated_response(data)
 
 
-class SeveralTagsFilterBackend(filters.BaseFilterBackend):
+class TagsFavoritesFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         tags = request.query_params.getlist('tags', [])
 
         if tags:
             return queryset.filter(tags__slug__in=tags)
+
+        is_favorited = request.query_params.get('is_favorited', None)
+        if is_favorited is not None:
+            if not request.user.is_authenticated:
+                return queryset.none()
+            recipes = Recipe.objects.filter(favorites__user=request.user)
+            return recipes
 
         return queryset
 
@@ -180,9 +187,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrReadOnly, IsAuthenticatedOrReadOnly)
     serializer_class = RecipeSerializer
-    filter_backends = (DjangoFilterBackend, SeveralTagsFilterBackend)
+    filter_backends = (DjangoFilterBackend, TagsFavoritesFilterBackend)
     filterset_fields = (
-        # 'is_favorited', 'is_in_shopping_cart',
+        # 'is_in_shopping_cart',
         'author', 'tags__slug')
     pagination_class = LimitOffsetPagination  # ConditionalPagination
 
@@ -198,19 +205,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
 
-    @action(methods=['POST'], detail=True, url_path='favorite')
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='favorite')
     def set_favorite(self, request, pk=None):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
+        favorite = Favorite.objects.filter(recipe=recipe, user=request.user)
 
-        if Favorite.objects.filter(recipe=recipe, user=user).exists():
-            return Response('Cannot add to the favorites twice', status=status.HTTP_400_BAD_REQUEST)
+        if request.method == 'POST':
+            if favorite.exists():
+                return Response(
+                    {'detail': 'Cannot add to the favorites twice'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        favorite = Favorite.objects.create(recipe=recipe, user=user)
+            favorite = Favorite.objects.create(recipe=recipe, user=user)
+            serializer = FavoriteSerializer(favorite)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        serializer = FavoriteSerializer(favorite)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.method == 'DELETE':
+            if favorite.exists():
+                favorite.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 def shortURLRedirect(request, hash):
