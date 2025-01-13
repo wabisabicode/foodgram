@@ -311,4 +311,16 @@ class RecipeShortURLSerializer(serializers.ModelSerializer):
 class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite
-        fields = '__all__'
+        fields = ('recipe',)
+
+    def to_representation(self, instance):
+        recipe = instance.recipe
+
+        recipe_data = {
+            'id': recipe.id,
+            'name': recipe.name,
+            'image': recipe.image.url,
+            'cooking_time': recipe.cooking_time,
+        }
+
+        return recipe_data

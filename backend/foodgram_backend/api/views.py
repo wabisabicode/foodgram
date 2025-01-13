@@ -198,6 +198,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
 
+    @action(methods=['POST'], detail=True, url_path='favorite')
+    def set_favorite(self, request, pk=None):
+        user = request.user
+        recipe = get_object_or_404(Recipe, pk=pk)
+
+        favorite = Favorite.objects.create(recipe=recipe, user=user)
+
+        serializer = FavoriteSerializer(favorite)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 def shortURLRedirect(request, hash):
     recipe_short_url = get_object_or_404(RecipeShortURL, hash=hash)
@@ -206,7 +217,7 @@ def shortURLRedirect(request, hash):
     return redirect(recipe_detail_url)
 
 
-class FavoriteViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    permission_classes = (IsAuthenticated,)
-    queryset = Favorite.objects.all()
-    serializer_class = FavoriteSerializer
+# class FavoriteViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+#     permission_classes = (IsAuthenticated,)
+#     queryset = Favorite.objects.all()
+#     serializer_class = FavoriteSerializer
