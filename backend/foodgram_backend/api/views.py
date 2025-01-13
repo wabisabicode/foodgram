@@ -203,6 +203,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
 
+        if Favorite.objects.filter(recipe=recipe, user=user).exists():
+            return Response('Cannot add to the favorites twice', status=status.HTTP_400_BAD_REQUEST)
+
         favorite = Favorite.objects.create(recipe=recipe, user=user)
 
         serializer = FavoriteSerializer(favorite)
