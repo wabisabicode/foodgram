@@ -335,7 +335,8 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
-    creator = serializers.SerializerMethodField()
+    # creator = serializers.SerializerMethodField()
+    creator = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = Subscription
@@ -348,10 +349,25 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             )
         ]
 
-    def get_creator(self, obj):
-        creator_serializer = CustomUserSerializer(obj.creator)
-        print(creator_serializer.data)
-        return creator_serializer.data
+    def to_representation(self, instance):
+        creator = instance.creator
+        recipes = creator.recipes.all()
+
+        creator_data = {
+            'email': creator.email,
+            'id': creator.id,
+            'username': creator.username,
+            'first_name': creator.first_name,
+            'last_name': creator.last_name,
+            # 'is_subscribed': creator.is_subscribed,
+            'recipes': recipes,
+            # 'avatar': creator.avatar.url
+        }
+        return creator_data
+    # def get_creator(self, obj):
+    #     creator_serializer = CustomUserSerializer(obj.creator)
+    #     print(creator_serializer.data)
+    #     return creator_serializer.data
     # def to_representation(self, instance):
     #     recipe = instance.recipe
 
