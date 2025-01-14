@@ -10,6 +10,7 @@ from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 from common.help_functions import generate_random_filename
 from recipe.models import Tag, Ingredient, Recipe, Favorite
 from recipe.models import RecipeTag, RecipeIngredient, RecipeShortURL
+from users.models import Subscription
 
 User = get_user_model()
 
@@ -331,3 +332,30 @@ class FavoriteSerializer(serializers.ModelSerializer):
         }
 
         return recipe_data
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    creator = CustomUserSerializer(read_only=True)
+
+    class Meta:
+        model = Subscription
+        fields = ('creator',)
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Subscription.objects.all(),
+                fields=['subscriber', 'creator'],
+                message='You have already subscribed to this creator.'
+            )
+        ]
+
+    # def to_representation(self, instance):
+    #     recipe = instance.recipe
+
+    #     recipe_data = {
+    #         'id': recipe.id,
+    #         'name': recipe.name,
+    #         'image': recipe.image.url,
+    #         'cooking_time': recipe.cooking_time,
+    #     }
+
+    #     return recipe_data

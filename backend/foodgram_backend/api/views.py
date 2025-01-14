@@ -18,7 +18,9 @@ from .serializers import SetPasswordSerializer, TokenCreateSerializer
 from .serializers import AvatarSerializer, TagSerializer, IngredientSerializer
 from .serializers import RecipeSerializer, FavoriteSerializer
 from .serializers import RecipeShortURLSerializer
+from .serializers import SubscriptionSerializer
 from recipe.models import Tag, Ingredient, Recipe, Favorite, RecipeShortURL
+from users.models import Subscription
 
 User = get_user_model()
 
@@ -27,12 +29,37 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     pagination_class = LimitOffsetPagination
-    http_method_names = ['get', 'post']
+    http_method_names = ['get', 'post', 'delete']
 
     def get_serializer_class(self):
         if self.action == 'create':
             return CustomUserCreateSerializer
         return CustomUserSerializer
+
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='subscribe', permission_classes=[IsAuthorOrReadOnly])
+    def toggle_subscription(self, request, pk=None):
+        subscriber = request.user
+        creator = get_object_or_404(User, pk=pk)
+
+        subscription = Subscription.objects.filter(subscriber=subscriber, creator=creator)
+
+        if request.method == 'POST':
+            if subscription.exists():
+                return Response(
+                    {'detail': 'Cannot subscribe twice'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            subscription = Subscription.objects.create(subscriber=subscriber, creator=creator)
+            serializer = SubscriptionSerializer(subscription)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        if request.method == 'DELETE':
+            if subscription.exists():
+                subscription.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class MeView(APIView):
