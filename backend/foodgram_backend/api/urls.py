@@ -3,6 +3,7 @@ from rest_framework.routers import SimpleRouter
 
 from .views import AvatarView, UserViewSet, MeView, SetPasswordView, TokenCreateView, TokenLogoutView
 from .views import TagListRetrieveViewSet, IngredientListRetrieveViewSet, RecipeViewSet
+from .views import MySubscriptions
 
 app_name = 'api'
 
@@ -18,6 +19,7 @@ urlpatterns = [
     path('users/me/', MeView.as_view(), name='users-me'),
     path('users/me/avatar/', AvatarView.as_view(), name='users-avatar'),
     path('users/set_password/', SetPasswordView.as_view(), name='set-password'),
+    path('users/subscriptions/', MySubscriptions.as_view(), name='my-subscriptions'),
     path('auth/token/login/', TokenCreateView.as_view(), name='token-login'),
     path('auth/token/logout/', TokenLogoutView.as_view(), name='token-logout'),
     # path('recipes/<int:pk>/favorite/', FavoriteViewSet, name='favorite'),
