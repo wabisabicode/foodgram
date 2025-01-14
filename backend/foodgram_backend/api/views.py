@@ -36,7 +36,8 @@ class UserViewSet(viewsets.ModelViewSet):
             return CustomUserCreateSerializer
         return CustomUserSerializer
 
-    @action(methods=['POST', 'DELETE'], detail=True, url_path='subscribe', permission_classes=[IsAuthorOrReadOnly])
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='subscribe',
+            permission_classes=[IsAuthorOrReadOnly, IsAuthenticated])
     def toggle_subscription(self, request, pk=None):
         subscriber = request.user
         creator = get_object_or_404(User, pk=pk)
