@@ -31,7 +31,7 @@ class Subscription(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['subscriber', 'creator'],
                                     name='unique_subscription'),
-            models.CheckConstraint(check=~models.Q(user=models.F('creator')),
+            models.CheckConstraint(check=~models.Q(subscriber=models.F('creator')),
                                    name='%(app_label)s_%(class)s_no_selffollow'
                                    )
         ]
