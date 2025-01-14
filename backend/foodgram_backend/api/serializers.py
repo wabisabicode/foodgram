@@ -366,3 +366,20 @@ class CreatorSerializer(serializers.ModelSerializer):
     def get_recipes_count(self, obj):
         request = self.context.get('request')
         return Recipe.objects.filter(author=request.user).count()
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        request = self.context.get('request')
+        limit = request.query_params.get('recipes_limit')
+
+        if limit is not None:
+            try:
+                limit = int(limit)
+                if limit > 0:
+                    data['recipes'] = data['recipes'][:limit]
+            except ValueError:
+                raise serializers.ValidationError(
+                    'Invalid recipes_limit value')
+
+        return data
