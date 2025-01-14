@@ -42,7 +42,7 @@ class Recipe(models.Model):
         verbose_name='Время приготовления',
         validators=[MinValueValidator(MIN_COOKING_TIME)])
     author = models.ForeignKey(
-        FGUser, verbose_name='Автор', on_delete=models.CASCADE)
+        FGUser, verbose_name='Автор', on_delete=models.CASCADE, related_name='recipes')
     # Looks like dynamic properties, i.e. to handle through Many-to-Many deps
     # is_favorited = models.ManyToManyField(
     #     User, through='RecipeIsFavorited', verbose_name='В избранном')
