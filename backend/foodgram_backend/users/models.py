@@ -26,3 +26,10 @@ class Subscription(models.Model):
         FGUser, related_name='following', on_delete=models.CASCADE)
     creator = models.ForeignKey(
         FGUser, related_name='subscribers', on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['subscriber', 'creator'],
+                name='unique_subscription')
+        ]
