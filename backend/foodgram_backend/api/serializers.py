@@ -139,6 +139,12 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ShortRecipeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'image', 'name', 'cooking_time')
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -334,13 +340,15 @@ class FavoriteSerializer(serializers.ModelSerializer):
         return recipe_data
 
 
-class SubscriptionSerializer(serializers.ModelSerializer):
-    # creator = serializers.SerializerMethodField()
-    creator = CustomUserSerializer(read_only=True)
+class CreatorSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = ShortRecipeSerializer(many=True, read_only=True)
+    recipes_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = Subscription
-        fields = ('creator',)
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'avatar', 'is_subscribed', 'recipes', 'recipes_count')
         validators = [
             UniqueTogetherValidator(
                 queryset=Subscription.objects.all(),
@@ -349,33 +357,12 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             )
         ]
 
-    def to_representation(self, instance):
-        creator = instance.creator
-        recipes = creator.recipes.all()
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        if not request.user.is_authenticated:
+            return False
+        return Subscription.objects.filter(subscriber=request.user, creator=obj).exists()
 
-        creator_data = {
-            'email': creator.email,
-            'id': creator.id,
-            'username': creator.username,
-            'first_name': creator.first_name,
-            'last_name': creator.last_name,
-            # 'is_subscribed': creator.is_subscribed,
-            'recipes': recipes,
-            # 'avatar': creator.avatar.url
-        }
-        return creator_data
-    # def get_creator(self, obj):
-    #     creator_serializer = CustomUserSerializer(obj.creator)
-    #     print(creator_serializer.data)
-    #     return creator_serializer.data
-    # def to_representation(self, instance):
-    #     recipe = instance.recipe
-
-    #     recipe_data = {
-    #         'id': recipe.id,
-    #         'name': recipe.name,
-    #         'image': recipe.image.url,
-    #         'cooking_time': recipe.cooking_time,
-    #     }
-
-    #     return recipe_data
+    def get_recipes_count(self, obj):
+        request = self.context.get('request')
+        return Recipe.objects.filter(author=request.user).count()
