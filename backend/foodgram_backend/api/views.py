@@ -18,7 +18,7 @@ from .serializers import SetPasswordSerializer, TokenCreateSerializer
 from .serializers import AvatarSerializer, TagSerializer, IngredientSerializer
 from .serializers import RecipeSerializer, FavoriteSerializer
 from .serializers import RecipeShortURLSerializer
-from .serializers import SubscriptionSerializer
+from .serializers import CreatorSerializer
 from recipe.models import Tag, Ingredient, Recipe, Favorite, RecipeShortURL
 from users.models import Subscription
 
@@ -51,7 +51,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 )
 
             subscription = Subscription.objects.create(subscriber=subscriber, creator=creator)
-            serializer = SubscriptionSerializer(subscription)
+            serializer = CreatorSerializer(creator, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
