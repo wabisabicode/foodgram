@@ -29,7 +29,9 @@ class Subscription(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
-                fields=['subscriber', 'creator'],
-                name='unique_subscription')
+            models.UniqueConstraint(fields=['subscriber', 'creator'],
+                                    name='unique_subscription'),
+            models.CheckConstraint(check=~models.Q(user=models.F('creator')),
+                                   name='%(app_label)s_%(class)s_no_selffollow'
+                                   )
         ]
