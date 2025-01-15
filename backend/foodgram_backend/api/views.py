@@ -52,6 +52,12 @@ class UserViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
+            if subscriber == creator:
+                return Response(
+                    {'detail': 'Cannot subscribe to myself'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             subscription = Subscription.objects.create(subscriber=subscriber, creator=creator)
             serializer = CreatorSerializer(creator, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
