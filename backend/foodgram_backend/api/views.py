@@ -21,6 +21,7 @@ from .serializers import RecipeShortURLSerializer, ShortRecipeSerializer
 from .serializers import CreatorSerializer
 from recipe.models import Tag, Ingredient, Recipe, Favorite, RecipeShortURL
 from users.models import Subscription
+from shopping_cart.models import ShoppingCartItem
 
 User = get_user_model()
 
@@ -269,6 +270,30 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'DELETE':
             if favorite.exists():
                 favorite.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='shopping_cart')
+    def toggle_shopping_cart_item(self, request, pk):
+        user = request.user
+        recipe = get_object_or_404(Recipe, pk=pk)
+        shopping_cart_item = ShoppingCartItem.objects.filter(user=user, recipe=recipe)
+
+        if request.method == 'POST':
+            if shopping_cart_item.exists():
+                return Response(
+                    {'detail': 'Cannot add to the favorites twice'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            shopping_cart_item = ShoppingCartItem.objects.create(recipe=recipe, user=user)
+            serializer = ShortRecipeSerializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        if request.method == 'DELETE':
+            if shopping_cart_item.exists():
+                shopping_cart_item.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
