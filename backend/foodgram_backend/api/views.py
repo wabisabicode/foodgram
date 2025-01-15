@@ -12,6 +12,7 @@ from rest_framework.permissions import (
     AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 
 from .permissions import IsAuthorOrReadOnly
 from .serializers import CustomUserSerializer, CustomUserCreateSerializer
@@ -20,7 +21,7 @@ from .serializers import AvatarSerializer, TagSerializer, IngredientSerializer
 from .serializers import RecipeSerializer  # , FavoriteSerializer
 from .serializers import RecipeShortURLSerializer, ShortRecipeSerializer
 from .serializers import CreatorSerializer
-from recipe.models import Tag, Ingredient, Recipe, Favorite, RecipeShortURL
+from recipe.models import Tag, Ingredient, Recipe, Favorite, RecipeIngredient, RecipeShortURL
 from users.models import Subscription
 from shopping_cart.models import ShoppingCartItem
 
@@ -324,8 +325,20 @@ def shortURLRedirect(request, hash):
 #     queryset = Favorite.objects.all()
 #     serializer_class = FavoriteSerializer
 
+@api_view(['GET'])
 def download_shopping_cart(request):
-    shopping_list = ['empty list']
+    cart_recipes = Recipe.objects.filter(shopping_cart_items__user=request.user)
+
+    shopping_list = {}
+    for recipe in cart_recipes:
+        for ingredient in recipe.ingredients.all():
+            recipe_ingredient = get_object_or_404(
+                RecipeIngredient, ingredient=ingredient, recipe=recipe)
+            amount = recipe_ingredient.amount
+            if ingredient.name in shopping_list.keys():
+                shopping_list[ingredient.name] += amount
+            else:
+                shopping_list[ingredient.name] = amount
 
     return HttpResponse(
         shopping_list,
