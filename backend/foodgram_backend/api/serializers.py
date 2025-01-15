@@ -74,9 +74,11 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 class CustomUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
-    # TODO: change to the real subscription check
     def get_is_subscribed(self, obj):
-        return False
+        request = self.context.get('request')
+        if not request.user.is_authenticated:
+            return False
+        return Subscription.objects.filter(subscriber=request.user, creator=obj).exists()
 
     class Meta:
         model = User
