@@ -87,30 +87,12 @@ class MySubscriptions(APIView):
 
 
 class MeView(APIView):
-    # queryset = User.objects.all()
-    # serializer_class = CustomUserSerializer
     permission_classes = (IsAuthenticated,)
-    # http_method_names = ['get']
 
     def get(self, request):
-        print('Get-Request to ME!!!!!')
         user = request.user
-        serializer = CustomUserSerializer(user)
+        serializer = CustomUserSerializer(user, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    # def patch(self, request):
-    #     user = request.user
-    #     serializer = UserSerializer(user, data=request.data, partial=True)
-    #     serializer.is_valid(raise_exception=True)
-
-    #     if 'role' in request.data:
-    #         return Response(
-    #             {'role': 'Modifying the role is not allowed.'},
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         )
-
-    #     serializer.save()
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class SetPasswordView(APIView):
