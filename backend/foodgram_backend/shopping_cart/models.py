@@ -21,7 +21,7 @@ User = get_user_model()
 class ShoppingCartItem(models.Model):
     # cart = models.ForeignKey(ShoppingCart, verbose_name='Корзина', on_delete=models.CASCADE)
     user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, verbose_name='Рецепт', on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, verbose_name='Рецепт', on_delete=models.CASCADE, related_name='shopping_cart_items')
 
     class Meta:
         verbose_name = 'Элемент в корзине'
