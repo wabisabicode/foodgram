@@ -228,11 +228,26 @@ class TagsFavoritesFilterBackend(filters.BaseFilterBackend):
         return queryset
 
 
+class ShoppingCartFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        is_in_shopping_cart = request.query_params.get('is_in_shopping_cart', None)
+
+        print(f'is_in_shopping_cart: {is_in_shopping_cart}')
+        if is_in_shopping_cart is not None:
+            if not request.user.is_authenticated:
+                return queryset.none()
+            recipes = Recipe.objects.filter(shopping_cart_items__user=request.user)
+            return recipes
+
+        return queryset
+
+
+
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrReadOnly, IsAuthenticatedOrReadOnly)
     serializer_class = RecipeSerializer
-    filter_backends = (DjangoFilterBackend, TagsFavoritesFilterBackend)
+    filter_backends = (DjangoFilterBackend, TagsFavoritesFilterBackend, ShoppingCartFilterBackend)
     filterset_fields = (
         # 'is_in_shopping_cart',
         'author', 'tags__slug')
@@ -283,7 +298,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             if shopping_cart_item.exists():
                 return Response(
-                    {'detail': 'Cannot add to the favorites twice'},
+                    {'detail': 'Cannot add to the shopping cart twice'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
