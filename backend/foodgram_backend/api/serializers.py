@@ -10,6 +10,7 @@ from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 from common.help_functions import generate_random_filename
 from recipe.models import Tag, Ingredient, Recipe, Favorite
 from recipe.models import RecipeTag, RecipeIngredient, RecipeShortURL
+from shopping_cart.models import ShoppingCartItem
 from users.models import Subscription
 
 User = get_user_model()
@@ -170,8 +171,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request.user.is_authenticated:
             return False
-        # TODO: change to real shopping cart test
-        return False
+        return ShoppingCartItem.objects.filter(user=request.user, recipe=obj).exists()
 
     def get_ingredients(self, obj):
         recipe_ingredients = RecipeIngredient.objects.filter(recipe=obj)
