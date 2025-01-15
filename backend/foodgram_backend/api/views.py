@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -313,3 +314,16 @@ def shortURLRedirect(request, hash):
 #     permission_classes = (IsAuthenticated,)
 #     queryset = Favorite.objects.all()
 #     serializer_class = FavoriteSerializer
+
+def download_shopping_cart(request):
+    shopping_list = []
+
+    return HttpResponse(
+        shopping_list,
+        headers={
+            "Content-Type": "text/plain",
+            # "Content-Type": "text/csv",
+            # "Content-Type": "application/pdf",
+            "Content-Disposition": 'attachment; filename="shopping_list.txt"',
+        },
+    )
