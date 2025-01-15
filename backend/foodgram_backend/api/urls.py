@@ -24,6 +24,6 @@ urlpatterns = [
     path('auth/token/login/', TokenCreateView.as_view(), name='token-login'),
     path('auth/token/logout/', TokenLogoutView.as_view(), name='token-logout'),
     path('recipes/download_shopping_list/',
-         download_shopping_cart.as_view(), name='download-shopping-list'),
+         download_shopping_cart, name='download-shopping-list'),
     path('', include(router_v1.urls)),
 ]
