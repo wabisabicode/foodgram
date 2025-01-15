@@ -143,6 +143,13 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'image', 'name', 'cooking_time')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=['user', 'recipe'],
+                message='This recipe is already in your favorites.'
+            )
+        ]
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -315,29 +322,29 @@ class RecipeShortURLSerializer(serializers.ModelSerializer):
         fields = ('short_link',)
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Favorite
-        fields = ('recipe',)
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Favorite.objects.all(),
-                fields=['user', 'recipe'],
-                message='This recipe is already in your favorites.'
-            )
-        ]
+# class FavoriteSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Favorite
+#         fields = ('recipe',)
+#         validators = [
+#             UniqueTogetherValidator(
+#                 queryset=Favorite.objects.all(),
+#                 fields=['user', 'recipe'],
+#                 message='This recipe is already in your favorites.'
+#             )
+#         ]
 
-    def to_representation(self, instance):
-        recipe = instance.recipe
+#     def to_representation(self, instance):
+#         recipe = instance.recipe
 
-        recipe_data = {
-            'id': recipe.id,
-            'name': recipe.name,
-            'image': recipe.image.url,
-            'cooking_time': recipe.cooking_time,
-        }
+#         recipe_data = {
+#             'id': recipe.id,
+#             'name': recipe.name,
+#             'image': recipe.image.url,
+#             'cooking_time': recipe.cooking_time,
+#         }
 
-        return recipe_data
+#         return recipe_data
 
 
 class CreatorSerializer(serializers.ModelSerializer):

@@ -16,8 +16,8 @@ from .permissions import IsAuthorOrReadOnly
 from .serializers import CustomUserSerializer, CustomUserCreateSerializer
 from .serializers import SetPasswordSerializer, TokenCreateSerializer
 from .serializers import AvatarSerializer, TagSerializer, IngredientSerializer
-from .serializers import RecipeSerializer, FavoriteSerializer
-from .serializers import RecipeShortURLSerializer
+from .serializers import RecipeSerializer  # , FavoriteSerializer
+from .serializers import RecipeShortURLSerializer, ShortRecipeSerializer
 from .serializers import CreatorSerializer
 from recipe.models import Tag, Ingredient, Recipe, Favorite, RecipeShortURL
 from users.models import Subscription
@@ -263,7 +263,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 )
 
             favorite = Favorite.objects.create(recipe=recipe, user=user)
-            serializer = FavoriteSerializer(favorite)
+            serializer = ShortRecipeSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
