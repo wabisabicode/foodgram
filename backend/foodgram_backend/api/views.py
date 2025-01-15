@@ -316,7 +316,7 @@ def shortURLRedirect(request, hash):
 #     serializer_class = FavoriteSerializer
 
 def download_shopping_cart(request):
-    shopping_list = []
+    shopping_list = ['empty list']
 
     return HttpResponse(
         shopping_list,
