@@ -4,6 +4,7 @@ from rest_framework.routers import SimpleRouter
 from .views import AvatarView, UserViewSet, MeView, SetPasswordView, TokenCreateView, TokenLogoutView
 from .views import TagListRetrieveViewSet, IngredientListRetrieveViewSet, RecipeViewSet
 from .views import MySubscriptions
+from .views import download_shopping_cart
 
 app_name = 'api'
 
@@ -22,6 +23,7 @@ urlpatterns = [
     path('users/subscriptions/', MySubscriptions.as_view(), name='my-subscriptions'),
     path('auth/token/login/', TokenCreateView.as_view(), name='token-login'),
     path('auth/token/logout/', TokenLogoutView.as_view(), name='token-logout'),
-    # path('recipes/<int:pk>/favorite/', FavoriteViewSet, name='favorite'),
+    path('recipes/download_shopping_list/',
+         download_shopping_cart.as_view(), name='download-shopping-list'),
     path('', include(router_v1.urls)),
 ]
