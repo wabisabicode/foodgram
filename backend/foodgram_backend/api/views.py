@@ -179,14 +179,23 @@ class TagListRetrieveViewSet(mixins.ListModelMixin,
     pagination_class = None
 
 
+class IngredientFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        lookup_value = request.query_params.get('name', None)
+
+        if lookup_value is not None:
+            ingredients = Ingredient.objects.filter(name__startswith=lookup_value)
+            return ingredients
+
+        return queryset
+
+
 class IngredientListRetrieveViewSet(mixins.ListModelMixin,
                                     mixins.RetrieveModelMixin,
                                     viewsets.GenericViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filterset_fields = ('name',)
-    search_fields = ('^name',)
+    filter_backends = (IngredientFilterBackend,)
     pagination_class = None
 
 
