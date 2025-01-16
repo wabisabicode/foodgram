@@ -1,10 +1,9 @@
 from django.contrib import admin
 
-from .models import Ingredient, Recipe, Tag, Favorite
+from .models import Ingredient, Recipe, Tag
 from .models import RecipeTag, RecipeIngredient
 
 admin.site.register(Tag)
-admin.site.register(Favorite)
 
 
 class RecipeTagInline(admin.TabularInline):
