@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib import admin
 from django.core.validators import MinValueValidator
 from django.db import models
 
@@ -65,6 +66,12 @@ class Recipe(models.Model):
     pub_date = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата публикации')
 
+    @admin.display(
+        description='Добавлений в избранное',
+    )
+    def favorites_count(self):
+        return self.favorites.count()
+
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
@@ -84,6 +91,9 @@ class RecipeTag(models.Model):
         verbose_name = 'Связь рецепта и тега'
         verbose_name_plural = 'Связи рецепта и тега'
 
+    def __str__(self):
+        return self.tag.name
+
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
@@ -95,6 +105,9 @@ class RecipeIngredient(models.Model):
     class Meta:
         verbose_name = 'Связь рецепта и ингредиента'
         verbose_name_plural = 'Связи рецепта и ингредиента'
+
+    def __str__(self):
+        return self.ingredient.name
 
 
 class RecipeShortURL(models.Model):
