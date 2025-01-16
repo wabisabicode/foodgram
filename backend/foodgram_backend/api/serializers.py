@@ -1,9 +1,9 @@
 import base64
 
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
 from djoser.serializers import UserSerializer, UserCreateSerializer
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
@@ -78,7 +78,8 @@ class CustomUserSerializer(UserSerializer):
         request = self.context.get('request')
         if not request.user.is_authenticated:
             return False
-        return Subscription.objects.filter(subscriber=request.user, creator=obj).exists()
+        return Subscription.objects.filter(
+            subscriber=request.user, creator=obj).exists()
 
     class Meta:
         model = User
@@ -173,7 +174,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request.user.is_authenticated:
             return False
-        return ShoppingCartItem.objects.filter(user=request.user, recipe=obj).exists()
+        return ShoppingCartItem.objects.filter(
+            user=request.user, recipe=obj).exists()
 
     def get_ingredients(self, obj):
         recipe_ingredients = RecipeIngredient.objects.filter(recipe=obj)
@@ -274,7 +276,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        # Take care of non-object fields
         instance.name = validated_data.get('name', instance.name)
         instance.image = validated_data.get('image', instance.image)
         instance.text = validated_data.get('text', instance.text)
@@ -324,31 +325,6 @@ class RecipeShortURLSerializer(serializers.ModelSerializer):
         fields = ('short_link',)
 
 
-# class FavoriteSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Favorite
-#         fields = ('recipe',)
-#         validators = [
-#             UniqueTogetherValidator(
-#                 queryset=Favorite.objects.all(),
-#                 fields=['user', 'recipe'],
-#                 message='This recipe is already in your favorites.'
-#             )
-#         ]
-
-#     def to_representation(self, instance):
-#         recipe = instance.recipe
-
-#         recipe_data = {
-#             'id': recipe.id,
-#             'name': recipe.name,
-#             'image': recipe.image.url,
-#             'cooking_time': recipe.cooking_time,
-#         }
-
-#         return recipe_data
-
-
 class CreatorSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = ShortRecipeSerializer(many=True, read_only=True)
@@ -370,7 +346,8 @@ class CreatorSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request.user.is_authenticated:
             return False
-        return Subscription.objects.filter(subscriber=request.user, creator=obj).exists()
+        return Subscription.objects.filter(
+            subscriber=request.user, creator=obj).exists()
 
     def get_recipes_count(self, obj):
         request = self.context.get('request')
