@@ -5,27 +5,26 @@ from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import (
     AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view, permission_classes
 
 from .filters import (TagsFilterBackend, IngredientFilterBackend,
                       FavoritesFilterBackend, ShoppingCartFilterBackend)
 from .permissions import IsAuthorOrReadOnly
-from .serializers import CustomUserSerializer, CustomUserCreateSerializer
-from .serializers import SetPasswordSerializer, TokenCreateSerializer
-from .serializers import AvatarSerializer, TagSerializer, IngredientSerializer
-from .serializers import RecipeSerializer
-from .serializers import RecipeShortURLSerializer, ShortRecipeSerializer
-from .serializers import CreatorSerializer
-from recipe.models import Tag, Ingredient, Recipe, Favorite, RecipeIngredient, RecipeShortURL
-from users.models import Subscription
+from .serializers import (CustomUserSerializer, CustomUserCreateSerializer,
+                          SetPasswordSerializer, TokenCreateSerializer,
+                          AvatarSerializer, RecipeSerializer, TagSerializer,
+                          IngredientSerializer, CreatorSerializer,
+                          RecipeShortURLSerializer, ShortRecipeSerializer)
+from recipe.models import (Tag, Ingredient, Recipe,
+                           Favorite, RecipeIngredient, RecipeShortURL)
 from shopping_cart.models import ShoppingCartItem
+from users.models import Subscription
 
 User = get_user_model()
 
@@ -47,7 +46,8 @@ class UserViewSet(viewsets.ModelViewSet):
         subscriber = request.user
         creator = get_object_or_404(User, pk=pk)
 
-        subscription = Subscription.objects.filter(subscriber=subscriber, creator=creator)
+        subscription = Subscription.objects.filter(
+            subscriber=subscriber, creator=creator)
 
         if request.method == 'POST':
             if subscription.exists():
@@ -62,8 +62,10 @@ class UserViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            subscription = Subscription.objects.create(subscriber=subscriber, creator=creator)
-            serializer = CreatorSerializer(creator, context={'request': request})
+            subscription = Subscription.objects.create(
+                subscriber=subscriber, creator=creator)
+            serializer = CreatorSerializer(
+                creator, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
@@ -85,7 +87,8 @@ class MySubscriptions(APIView):
         paginator = self.pagination_class()
         result_page = paginator.paginate_queryset(creators, request)
 
-        serializer = CreatorSerializer(result_page, context={'request': request}, many=True)
+        serializer = CreatorSerializer(
+            result_page, context={'request': request}, many=True)
 
         return paginator.get_paginated_response(serializer.data)
 
@@ -113,11 +116,12 @@ class SetPasswordView(APIView):
 
         if not user.check_password(current_password):
             raise ValidationError('Invalid current password')
-        else: # delete else and move the code below to the left? 
-            user.set_password(new_password)
-            user.save()
 
-        return Response('Password has been changed', status=status.HTTP_204_NO_CONTENT)
+        user.set_password(new_password)
+        user.save()
+
+        return Response('Password has been changed',
+                        status=status.HTTP_204_NO_CONTENT)
 
 
 class TokenCreateView(APIView):
@@ -196,10 +200,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend, TagsFilterBackend,
                        FavoritesFilterBackend, ShoppingCartFilterBackend)
-    filterset_fields = (
-        # 'is_in_shopping_cart',
-        'author', 'tags__slug')
-    pagination_class = LimitOffsetPagination  # ConditionalPagination
+    filterset_fields = ('author', 'tags__slug')
+    pagination_class = LimitOffsetPagination
 
     @action(detail=True, url_path='get-link')
     def get_short_link(self, request, pk):
@@ -241,7 +243,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def toggle_shopping_cart_item(self, request, pk):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        shopping_cart_item = ShoppingCartItem.objects.filter(user=user, recipe=recipe)
+        shopping_cart_item = ShoppingCartItem.objects.filter(
+            user=user, recipe=recipe)
 
         if request.method == 'POST':
             if shopping_cart_item.exists():
@@ -250,7 +253,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            shopping_cart_item = ShoppingCartItem.objects.create(recipe=recipe, user=user)
+            shopping_cart_item = ShoppingCartItem.objects.create(
+                recipe=recipe, user=user)
             serializer = ShortRecipeSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -272,7 +276,8 @@ def redirect_from_short_url(request, hash):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def download_shopping_cart(request):
-    cart_recipes = Recipe.objects.filter(shopping_cart_items__user=request.user)
+    cart_recipes = Recipe.objects.filter(
+        shopping_cart_items__user=request.user)
 
     shopping_list = {}
     for recipe in cart_recipes:
