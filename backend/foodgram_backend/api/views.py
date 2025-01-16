@@ -262,7 +262,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-def shortURLRedirect(request, hash):
+def redirect_from_short_url(request, hash):
     recipe_short_url = get_object_or_404(RecipeShortURL, hash=hash)
     recipe_detail_url = reverse(
         'api:recipes-detail', kwargs={'pk': recipe_short_url.recipe.pk})
