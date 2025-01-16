@@ -1,6 +1,28 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
 
 from .models import FGUser
 
-admin.site.register(FGUser, UserAdmin)
+
+class FGUserAdmin(admin.ModelAdmin):
+    list_display = (
+        'username',
+        'email',
+        'first_name',
+        'last_name',
+        'avatar',
+        'date_joined',
+        'is_staff',
+        'is_active',
+        'is_superuser',
+        'last_login'
+    )
+    search_fields = (
+        'username',
+        'email'
+    )
+    exclude = ('groups', 'user_permissions')
+
+
+admin.site.register(FGUser, FGUserAdmin)
+admin.site.unregister(Group)
