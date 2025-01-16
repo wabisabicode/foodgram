@@ -324,7 +324,6 @@ def download_shopping_cart(request):
                 shopping_list[ingredient.name][0] += amount
             else:
                 shopping_list[ingredient.name] = [amount, measurement_unit]
-                # shopping_list[ingredient.name][1] = 
 
     print(f'shopping_list: {shopping_list}')
 
