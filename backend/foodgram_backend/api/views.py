@@ -18,7 +18,7 @@ from .permissions import IsAuthorOrReadOnly
 from .serializers import CustomUserSerializer, CustomUserCreateSerializer
 from .serializers import SetPasswordSerializer, TokenCreateSerializer
 from .serializers import AvatarSerializer, TagSerializer, IngredientSerializer
-from .serializers import RecipeSerializer  # , FavoriteSerializer
+from .serializers import RecipeSerializer
 from .serializers import RecipeShortURLSerializer, ShortRecipeSerializer
 from .serializers import CreatorSerializer
 from recipe.models import Tag, Ingredient, Recipe, Favorite, RecipeIngredient, RecipeShortURL
@@ -101,7 +101,6 @@ class SetPasswordView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        print("SetPasswordView POST called")
         serializer = SetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -200,16 +199,6 @@ class IngredientListRetrieveViewSet(mixins.ListModelMixin,
     pagination_class = None
 
 
-# class ConditionalPagination(LimitOffsetPagination):
-#     def paginate_queryset(self, queryset, request, view=None):
-#         if request.query_params:
-#             return None
-#         return super().paginate_queryset(queryset, request, view)
-
-#     def get_paginated_response(self, data):
-#         return super().get_paginated_response(data)
-
-
 class TagsFavoritesFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         tags = request.query_params.getlist('tags', [])
@@ -239,7 +228,6 @@ class ShoppingCartFilterBackend(filters.BaseFilterBackend):
             return recipes
 
         return queryset
-
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -319,11 +307,6 @@ def shortURLRedirect(request, hash):
         'api:recipes-detail', kwargs={'pk': recipe_short_url.recipe.pk})
     return redirect(recipe_detail_url)
 
-
-# class FavoriteViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
-#     permission_classes = (IsAuthenticated,)
-#     queryset = Favorite.objects.all()
-#     serializer_class = FavoriteSerializer
 
 @api_view(['GET'])
 def download_shopping_cart(request):
