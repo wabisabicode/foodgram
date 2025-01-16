@@ -236,10 +236,18 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
 
             amount = ingredient_data.get('amount')
-            if amount <= 0:
+            if amount is None:
                 raise serializers.ValidationError(
-                    {'ingredients': 'Ingredient amount should be more than 0'}
-                )
+                    {'ingredients': 'Ingredient amount is required'})
+            try:
+                amount = int(amount)
+                if int(amount) <= 0:
+                    raise serializers.ValidationError(
+                        {'ingredients': 'Amount should be more than 0'}
+                    )
+            except ValueError:
+                raise serializers.ValidationError(
+                    {'ingredients': 'Amount must be a valid integer'})
 
             if ingredient_id in ingredient_id_list:
                 raise serializers.ValidationError(
