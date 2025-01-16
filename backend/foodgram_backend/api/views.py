@@ -283,10 +283,13 @@ def download_shopping_cart(request):
             else:
                 shopping_list[ingredient.name] = [amount, measurement_unit]
 
-    print(f'shopping_list: {shopping_list}')
+    shopping_list_items = '\n'.join(
+        f'{item}: {amount} {unit}'
+        for item, (amount, unit) in shopping_list.items()
+    )
 
     return HttpResponse(
-        shopping_list,
+        shopping_list_items,
         headers={
             "Content-Type": "text/plain",
             # "Content-Type": "text/csv",
