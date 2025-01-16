@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, status, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
@@ -14,6 +14,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 
+from .filters import (TagsFilterBackend, IngredientFilterBackend,
+                      FavoritesFilterBackend, ShoppingCartFilterBackend)
 from .permissions import IsAuthorOrReadOnly
 from .serializers import CustomUserSerializer, CustomUserCreateSerializer
 from .serializers import SetPasswordSerializer, TokenCreateSerializer
@@ -179,17 +181,6 @@ class TagListRetrieveViewSet(mixins.ListModelMixin,
     pagination_class = None
 
 
-class IngredientFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        lookup_value = request.query_params.get('name', None)
-
-        if lookup_value is not None:
-            ingredients = Ingredient.objects.filter(name__startswith=lookup_value)
-            return ingredients
-
-        return queryset
-
-
 class IngredientListRetrieveViewSet(mixins.ListModelMixin,
                                     mixins.RetrieveModelMixin,
                                     viewsets.GenericViewSet):
@@ -199,42 +190,12 @@ class IngredientListRetrieveViewSet(mixins.ListModelMixin,
     pagination_class = None
 
 
-class TagsFavoritesFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        tags = request.query_params.getlist('tags', [])
-
-        if tags:
-            return queryset.filter(tags__slug__in=tags)
-
-        is_favorited = request.query_params.get('is_favorited', None)
-        if is_favorited is not None:
-            if not request.user.is_authenticated:
-                return queryset.none()
-            recipes = Recipe.objects.filter(favorites__user=request.user)
-            return recipes
-
-        return queryset
-
-
-class ShoppingCartFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        is_in_shopping_cart = request.query_params.get('is_in_shopping_cart', None)
-
-        print(f'is_in_shopping_cart: {is_in_shopping_cart}')
-        if is_in_shopping_cart is not None:
-            if not request.user.is_authenticated:
-                return queryset.none()
-            recipes = Recipe.objects.filter(shopping_cart_items__user=request.user)
-            return recipes
-
-        return queryset
-
-
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrReadOnly, IsAuthenticatedOrReadOnly)
     serializer_class = RecipeSerializer
-    filter_backends = (DjangoFilterBackend, TagsFavoritesFilterBackend, ShoppingCartFilterBackend)
+    filter_backends = (DjangoFilterBackend, TagsFilterBackend,
+                       FavoritesFilterBackend, ShoppingCartFilterBackend)
     filterset_fields = (
         # 'is_in_shopping_cart',
         'author', 'tags__slug')
