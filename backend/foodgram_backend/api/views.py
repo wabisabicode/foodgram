@@ -319,10 +319,14 @@ def download_shopping_cart(request):
             recipe_ingredient = get_object_or_404(
                 RecipeIngredient, ingredient=ingredient, recipe=recipe)
             amount = recipe_ingredient.amount
+            measurement_unit = recipe_ingredient.ingredient.measurement_unit
             if ingredient.name in shopping_list.keys():
-                shopping_list[ingredient.name] += amount
+                shopping_list[ingredient.name][0] += amount
             else:
-                shopping_list[ingredient.name] = amount
+                shopping_list[ingredient.name] = [amount, measurement_unit]
+                # shopping_list[ingredient.name][1] = 
+
+    print(f'shopping_list: {shopping_list}')
 
     return HttpResponse(
         shopping_list,
