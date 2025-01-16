@@ -9,6 +9,7 @@ volumes:
 services:
   db:
     image: postgres:13.10
+    container_name: foodgram-db
     env_file: ../backend/.env
     volumes:
       - pg_data:/var/lib/postgresql/data
