@@ -3,7 +3,6 @@ from django.contrib import admin
 from .models import Ingredient, Recipe, Tag, Favorite
 from .models import RecipeTag, RecipeIngredient
 
-admin.site.register(Ingredient)
 admin.site.register(Tag)
 admin.site.register(Favorite)
 
@@ -30,4 +29,11 @@ class RecipeAdmin(admin.ModelAdmin):
     )
 
 
+class IngredientAdmin(admin.ModelAdmin):
+    list_display = ('name', 'measurement_unit')
+    search_fields = ('name',)
+    ordering = ('name',)
+
+
 admin.site.register(Recipe, RecipeAdmin)
+admin.site.register(Ingredient, IngredientAdmin)
