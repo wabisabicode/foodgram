@@ -8,7 +8,7 @@ class TagsFilterBackend(filters.BaseFilterBackend):
         tags = request.query_params.getlist('tags', [])
 
         if tags:
-            return queryset.filter(tags__slug__in=tags)
+            return queryset.filter(tags__slug__in=tags).distinct()
 
         return queryset
 
