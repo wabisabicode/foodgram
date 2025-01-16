@@ -2,3 +2,4 @@
 # python manage.py migrate
 # python manage.py collectstatic
 # cp -r collectstatic/. /backend_static/static/
+# cd common && python ../manage.py shell < load_data.py
