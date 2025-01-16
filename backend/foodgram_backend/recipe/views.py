@@ -1,3 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 
-# Create your views here.
+from .models import RecipeShortURL
+
+
+def redirect_from_short_url(request, hash):
+    recipe_short_url = get_object_or_404(RecipeShortURL, hash=hash)
+    recipe_detail_url = reverse(
+        'api:recipes-detail', kwargs={'pk': recipe_short_url.recipe.pk})
+    return redirect(recipe_detail_url)

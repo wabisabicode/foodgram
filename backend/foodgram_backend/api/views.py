@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.models import Token
@@ -264,13 +263,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return Response(status=status.HTTP_204_NO_CONTENT)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-def redirect_from_short_url(request, hash):
-    recipe_short_url = get_object_or_404(RecipeShortURL, hash=hash)
-    recipe_detail_url = reverse(
-        'api:recipes-detail', kwargs={'pk': recipe_short_url.recipe.pk})
-    return redirect(recipe_detail_url)
 
 
 @api_view(['GET'])

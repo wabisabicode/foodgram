@@ -2,12 +2,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-from api.views import redirect_from_short_url
+from recipe.views import redirect_from_short_url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls', namespace='api')),
-    path('s/<str:hash>/', redirect_from_short_url, name='redirect-from-short-link'),
+    path('s/<str:hash>/', redirect_from_short_url,
+         name='redirect-from-short-link'),
 
 ]
 
