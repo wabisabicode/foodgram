@@ -87,6 +87,10 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
+      - name: Symlink ../docs to infra folder
+        run: ln -s docs/ infra/
+      - name: Check with tree
+        run: tree .
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to Docker
