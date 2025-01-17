@@ -1,6 +1,6 @@
 from rest_framework import filters
 
-from recipe.models import Recipe, Ingredient
+from recipe.models import Ingredient, Recipe
 
 
 class TagsFilterBackend(filters.BaseFilterBackend):

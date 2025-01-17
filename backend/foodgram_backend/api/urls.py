@@ -1,10 +1,10 @@
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
-from .views import AvatarView, UserViewSet, MeView, SetPasswordView, TokenCreateView, TokenLogoutView
-from .views import TagListRetrieveViewSet, IngredientListRetrieveViewSet, RecipeViewSet
-from .views import MySubscriptions
-from .views import download_shopping_cart
+from .views import (AvatarView, IngredientListRetrieveViewSet, MeView,
+                    MySubscriptions, RecipeViewSet, SetPasswordView,
+                    TagListRetrieveViewSet, TokenCreateView, TokenLogoutView,
+                    UserViewSet, download_shopping_cart)
 
 app_name = 'api'
 

@@ -2,14 +2,14 @@ import base64
 
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
-from djoser.serializers import UserSerializer, UserCreateSerializer
 from django.shortcuts import get_object_or_404
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from common.help_functions import generate_random_filename
-from recipe.models import Tag, Ingredient, Recipe, Favorite
-from recipe.models import RecipeTag, RecipeIngredient, RecipeShortURL
+from recipe.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                           RecipeShortURL, RecipeTag, Tag)
 from shopping_cart.models import ShoppingCartItem
 from users.models import Subscription
 

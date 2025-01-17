@@ -7,23 +7,25 @@ from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import (
-    AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .filters import (TagsFilterBackend, IngredientFilterBackend,
-                      FavoritesFilterBackend, ShoppingCartFilterBackend)
-from .permissions import IsAuthorOrReadOnly
-from .serializers import (CustomUserSerializer, CustomUserCreateSerializer,
-                          SetPasswordSerializer, TokenCreateSerializer,
-                          AvatarSerializer, RecipeSerializer, TagSerializer,
-                          IngredientSerializer, CreatorSerializer,
-                          RecipeShortURLSerializer, ShortRecipeSerializer)
-from recipe.models import (Tag, Ingredient, Recipe,
-                           Favorite, RecipeIngredient, RecipeShortURL)
+from recipe.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                           RecipeShortURL, Tag)
 from shopping_cart.models import ShoppingCartItem
 from users.models import Subscription
+
+from .filters import (FavoritesFilterBackend, IngredientFilterBackend,
+                      ShoppingCartFilterBackend, TagsFilterBackend)
+from .permissions import IsAuthorOrReadOnly
+from .serializers import (AvatarSerializer, CreatorSerializer,
+                          CustomUserCreateSerializer, CustomUserSerializer,
+                          IngredientSerializer, RecipeSerializer,
+                          RecipeShortURLSerializer, SetPasswordSerializer,
+                          ShortRecipeSerializer, TagSerializer,
+                          TokenCreateSerializer)
 
 User = get_user_model()
 
