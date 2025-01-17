@@ -117,7 +117,8 @@ class RecipeShortURL(models.Model):
 
 
 class Favorite(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='favorites')
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name='favorites')
     user = models.ForeignKey(FGUser, on_delete=models.CASCADE)
 
     class Meta:
