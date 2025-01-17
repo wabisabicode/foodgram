@@ -10,13 +10,13 @@ services:
   db:
     image: postgres:13.10
     container_name: foodgram-db
-    env_file: ../backend/.env
+    env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
   backend:
     image: ${DOCKER_USERNAME}/foodgram_backend
     container_name: foodgram-back
-    env_file: ../backend/.env
+    env_file: .env
     volumes: 
       - media:/app/foodgram_backend/media
       - static:/backend_static
