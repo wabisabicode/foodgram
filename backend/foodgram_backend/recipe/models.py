@@ -37,21 +37,17 @@ class Tag(models.Model):
 
 class Recipe(models.Model):
     name = models.CharField(max_length=256, verbose_name='Название')
-    image = models.ImageField(upload_to='recipes/images', verbose_name='Изображение')
+    image = models.ImageField(
+        upload_to='recipes/images', verbose_name='Изображение')
     text = models.TextField(verbose_name='Текст')
     cooking_time = models.IntegerField(
         verbose_name='Время приготовления',
         validators=[MinValueValidator(MIN_COOKING_TIME)])
     author = models.ForeignKey(
-        FGUser, verbose_name='Автор', on_delete=models.CASCADE, related_name='recipes')
-    # Looks like dynamic properties, i.e. to handle through Many-to-Many deps
-    # is_favorited = models.ManyToManyField(
-    #     User, through='RecipeIsFavorited', verbose_name='В избранном')
-
-    # Through ShoppingCartItem and, possibly, ShoppingCart models
-    # is_in_shopping_cart = models.ManyToManyField(
-    #     User, through='RecipeIsInCart', verbose_name='В списке покупок')
-
+        FGUser, verbose_name='Автор',
+        on_delete=models.CASCADE,
+        related_name='recipes'
+    )
     tags = models.ManyToManyField(
         Tag,
         through='RecipeTag',
@@ -62,7 +58,6 @@ class Recipe(models.Model):
         through='RecipeIngredient',
         verbose_name='Ингредиент'
     )
-
     pub_date = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата публикации')
 
@@ -100,7 +95,8 @@ class RecipeIngredient(models.Model):
         'Recipe', verbose_name='Рецепт', on_delete=models.CASCADE)
     ingredient = models.ForeignKey(
         'Ingredient', verbose_name='Ингредиент', on_delete=models.CASCADE)
-    amount = models.IntegerField(verbose_name='Количество в рецепте', default=1)
+    amount = models.IntegerField(
+        verbose_name='Количество в рецепте', default=1)
 
     class Meta:
         verbose_name = 'Связь рецепта и ингредиента'
