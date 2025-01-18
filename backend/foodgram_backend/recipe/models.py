@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from common.constants import MIN_COOKING_TIME
+from common.constants import INGR_NAME_MAX_LENGTH, INGR_UNIT_MAX_LENGTH, MIN_COOKING_TIME, TAG_MAX_LENGTH
 from common.help_functions import generate_random_filename
 from users.models import FGUser
 
@@ -11,9 +11,10 @@ User = get_user_model()
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=128, verbose_name='Название')
+    name = models.CharField(
+        max_length=INGR_NAME_MAX_LENGTH, verbose_name='Название')
     measurement_unit = models.CharField(
-        max_length=64, verbose_name='Единицы измерения')
+        max_length=INGR_UNIT_MAX_LENGTH, verbose_name='Единицы измерения')
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -24,8 +25,10 @@ class Ingredient(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50, verbose_name='Название')
-    slug = models.SlugField(max_length=50, unique=True, verbose_name='Слаг')
+    name = models.CharField(
+        max_length=TAG_MAX_LENGTH, verbose_name='Название')
+    slug = models.SlugField(
+        max_length=TAG_MAX_LENGTH, unique=True, verbose_name='Слаг')
 
     class Meta:
         verbose_name = 'Тег'
