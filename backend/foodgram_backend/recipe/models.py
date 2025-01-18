@@ -3,7 +3,9 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from common.constants import INGR_NAME_MAX_LENGTH, INGR_UNIT_MAX_LENGTH, MIN_COOKING_TIME, RECIPE_NAME_MAX_LENGTH, SHORT_URL_MAX_LENGTH, TAG_MAX_LENGTH
+from common.constants import (INGR_NAME_MAX_LENGTH, INGR_UNIT_MAX_LENGTH,
+                              MIN_COOKING_TIME, RECIPE_NAME_MAX_LENGTH,
+                              SHORT_URL_MAX_LENGTH, TAG_MAX_LENGTH)
 from common.help_functions import generate_random_filename
 from users.models import FGUser
 
