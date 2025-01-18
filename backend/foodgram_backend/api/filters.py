@@ -19,7 +19,7 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
 
         if lookup_value is not None:
             ingredients = Ingredient.objects.filter(
-                name__startswith=lookup_value)
+                name__startswith=lookup_value.lower())
             return ingredients
 
         return queryset
