@@ -6,7 +6,6 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
@@ -19,6 +18,7 @@ from users.models import Subscription
 
 from .filters import (FavoritesFilterBackend, IngredientFilterBackend,
                       ShoppingCartFilterBackend, TagsFilterBackend)
+from .pagination import PageLimitPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (AvatarSerializer, CreatorSerializer,
                           CustomUserCreateSerializer, CustomUserSerializer,
@@ -33,7 +33,7 @@ User = get_user_model()
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
-    pagination_class = LimitOffsetPagination
+    pagination_class = PageLimitPagination
     http_method_names = ['get', 'post', 'delete']
 
     def get_serializer_class(self):
@@ -79,7 +79,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class MySubscriptions(APIView):
     permission_classes = (IsAuthenticated,)
-    pagination_class = LimitOffsetPagination
+    pagination_class = PageLimitPagination
 
     def get(self, request):
         subscriptions = request.user.following.all()
@@ -202,7 +202,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, TagsFilterBackend,
                        FavoritesFilterBackend, ShoppingCartFilterBackend)
     filterset_fields = ('author', 'tags__slug')
-    pagination_class = LimitOffsetPagination
+    pagination_class = PageLimitPagination
 
     @action(detail=True, url_path='get-link')
     def get_short_link(self, request, pk):
