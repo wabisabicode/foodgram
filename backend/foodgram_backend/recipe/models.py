@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from common.constants import INGR_NAME_MAX_LENGTH, INGR_UNIT_MAX_LENGTH, MIN_COOKING_TIME, TAG_MAX_LENGTH
+from common.constants import INGR_NAME_MAX_LENGTH, INGR_UNIT_MAX_LENGTH, MIN_COOKING_TIME, RECIPE_NAME_MAX_LENGTH, SHORT_URL_MAX_LENGTH, TAG_MAX_LENGTH
 from common.help_functions import generate_random_filename
 from users.models import FGUser
 
@@ -39,7 +39,8 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
-    name = models.CharField(max_length=256, verbose_name='Название')
+    name = models.CharField(
+        max_length=RECIPE_NAME_MAX_LENGTH, verbose_name='Название')
     image = models.ImageField(
         upload_to='recipes/images', verbose_name='Изображение')
     text = models.TextField(verbose_name='Текст')
@@ -115,7 +116,8 @@ class RecipeIngredient(models.Model):
 class RecipeShortURL(models.Model):
     recipe = models.ForeignKey(
         'Recipe', verbose_name='Рецепт', on_delete=models.CASCADE)
-    hash = models.CharField(max_length=8, verbose_name='Хеш')
+    hash = models.CharField(
+        max_length=SHORT_URL_MAX_LENGTH, verbose_name='Хеш')
 
     def generate_hash(self):
         self.hash = generate_random_filename(length=8)
