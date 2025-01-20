@@ -308,6 +308,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         for ingredient_data in ingredients_data:
             ingredient = get_object_or_404(
                 Ingredient, id=ingredient_data.get('id'))
+
+            RecipeIngredient.objects.update_or_create(
+                recipe=instance,
+                ingredient=ingredient,
+                amount=ingredient_data.get('amount')
+            )
+
             ingredients_list.append(ingredient)
         instance.ingredients.set(ingredients_list)
 
