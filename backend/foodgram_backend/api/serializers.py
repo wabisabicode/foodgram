@@ -288,12 +288,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.image = validated_data.get('image', instance.image)
-        instance.text = validated_data.get('text', instance.text)
-        instance.author = validated_data.get('author', instance.author)
-        instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time)
+        instance = super().update(instance, validated_data)
 
         # Tags is given by TagSerializer
         try:
