@@ -295,8 +295,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         instance = super().update(instance, validated_data)
 
-        tags_list = list(tags_data)
-        instance.tags.set(tags_list)
+        instance.tags.set(tags_data)
 
         # Ingredients is a SerializerMethodField
         ingredients_data = self.initial_data.get('ingredients')
