@@ -312,7 +312,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             RecipeIngredient.objects.update_or_create(
                 recipe=instance,
                 ingredient=ingredient,
-                amount=ingredient_data.get('amount')
+                defaults={'amount': ingredient_data.get('amount')}
             )
 
             ingredients_list.append(ingredient)
