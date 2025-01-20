@@ -291,14 +291,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        instance = super().update(instance, validated_data)
+        tags_data = validated_data.pop('tags')
 
-        # Tags is given by TagSerializer
-        try:
-            tags_data = validated_data.pop('tags')
-        except KeyError:
-            raise serializers.ValidationError(
-                {'tags': 'This field is required and cannot be empty.'})
+        instance = super().update(instance, validated_data)
 
         tags_list = list(tags_data)
         instance.tags.set(tags_list)
