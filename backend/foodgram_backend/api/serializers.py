@@ -4,6 +4,7 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
+from common.constants import EMAIL_MAX_LENGTH, NAME_MAX_LENGTH
 from recipe.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                            RecipeShortURL, RecipeTag, Tag)
 from shopping_cart.models import ShoppingCartItem
@@ -17,7 +18,7 @@ User = get_user_model()
 class CustomUserCreateSerializer(UserCreateSerializer):
     username = serializers.RegexField(
         regex=r'^[\w.@+-]+\Z',
-        max_length=150,
+        max_length=NAME_MAX_LENGTH,
         required=True,
         validators=(
             UniqueValidator(
@@ -32,7 +33,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         }
     )
     email = serializers.EmailField(
-        max_length=254,
+        max_length=EMAIL_MAX_LENGTH,
         required=True,
         validators=(
             UniqueValidator(
@@ -81,7 +82,7 @@ class SetPasswordSerializer(serializers.Serializer):
 
 
 class TokenCreateSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=254, required=True)
+    email = serializers.EmailField(max_length=EMAIL_MAX_LENGTH, required=True)
     password = serializers.CharField(
         required=True, style={'input_type': 'password'})
 
