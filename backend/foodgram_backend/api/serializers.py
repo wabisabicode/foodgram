@@ -164,6 +164,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagIDSerializer(many=True)
     ingredients = serializers.SerializerMethodField()
 
+    class Meta:
+        model = Recipe
+        exclude = ('pub_date',)
+
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         if not request.user.is_authenticated:
@@ -320,10 +324,6 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-
-    class Meta:
-        model = Recipe
-        exclude = ('pub_date',)
 
 
 class RecipeShortURLSerializer(serializers.ModelSerializer):
