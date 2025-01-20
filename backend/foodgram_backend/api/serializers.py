@@ -273,14 +273,17 @@ class RecipeSerializer(serializers.ModelSerializer):
         for tag in tags:
             RecipeTag.objects.create(tag=tag, recipe=recipe)
 
+        recipe_ingredients = []
         for ingredient_data in ingredients_data:
             ingredient = get_object_or_404(
                 Ingredient, id=ingredient_data.get('id'))
-            RecipeIngredient.objects.create(
+            recipe_ingredient = RecipeIngredient(
                 recipe=recipe,
                 ingredient=ingredient,
                 amount=ingredient_data.get('amount')
             )
+            recipe_ingredients.append(recipe_ingredient)
+        RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
         recipe_short_url = RecipeShortURL.objects.create(recipe=recipe)
         recipe_short_url.generate_hash()
