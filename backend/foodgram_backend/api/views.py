@@ -22,9 +22,9 @@ from .pagination import PageLimitPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (AvatarSerializer, CreatorSerializer,
                           CustomUserCreateSerializer, CustomUserSerializer,
-                          IngredientSerializer, RecipeSerializer,
+                          IngredientSerializer, RecipeWriteSerializer,
                           RecipeShortURLSerializer, SetPasswordSerializer,
-                          ShortRecipeSerializer, TagSerializer,
+                          ShortRecipeSerializer, TagReadSerializer,
                           TokenCreateSerializer)
 
 User = get_user_model()
@@ -182,7 +182,7 @@ class TagListRetrieveViewSet(mixins.ListModelMixin,
                              mixins.RetrieveModelMixin,
                              viewsets.GenericViewSet):
     queryset = Tag.objects.all()
-    serializer_class = TagSerializer
+    serializer_class = TagReadSerializer
     pagination_class = None
 
 
@@ -198,7 +198,7 @@ class IngredientListRetrieveViewSet(mixins.ListModelMixin,
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrReadOnly, IsAuthenticatedOrReadOnly)
-    serializer_class = RecipeSerializer
+    serializer_class = RecipeWriteSerializer
     filter_backends = (DjangoFilterBackend, TagsFilterBackend,
                        FavoritesFilterBackend, ShoppingCartFilterBackend)
     filterset_fields = ('author', 'tags__slug')
