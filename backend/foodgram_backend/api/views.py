@@ -22,8 +22,8 @@ from .pagination import PageLimitPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (AvatarSerializer, CreatorSerializer,
                           CustomUserCreateSerializer, CustomUserSerializer,
-                          IngredientSerializer, RecipeWriteSerializer,
-                          RecipeShortURLSerializer, SetPasswordSerializer,
+                          IngredientSerializer, RecipeShortURLSerializer,
+                          RecipeWriteSerializer, SetPasswordSerializer,
                           ShortRecipeSerializer, TagReadSerializer,
                           TokenCreateSerializer)
 
