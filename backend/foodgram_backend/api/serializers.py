@@ -106,24 +106,6 @@ class TagReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TagIDSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-
-    def to_representation(self, instance):
-        return {
-            'id': instance.id,
-            'name': instance.name,
-            'slug': instance.slug
-        }
-
-    def to_internal_value(self, tag_id):
-        try:
-            return Tag.objects.get(id=tag_id)
-        except Tag.DoesNotExist:
-            raise serializers.ValidationError(
-                {'tags': f'Tag with id {tag_id} does not exist'})
-
-
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
