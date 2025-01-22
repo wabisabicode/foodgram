@@ -190,21 +190,20 @@ class RecipeSerializer(serializers.ModelSerializer):
                 {'tags': 'This field is required and cannot be empty.'}
             )
 
-        tags_id_list = []
         for tag in tags:
             if not Tag.objects.filter(id=tag.id).exists():
                 raise serializers.ValidationError(
                     {'tags': f'Tag with id {tag.id} does not exist'}
                 )
 
-            if tag.id in tags_id_list:
-                raise serializers.ValidationError(
-                    {'tags': 'Tag should be provided only once'}
-                )
-            else:
-                tags_id_list.append(tag.id)
+        unique_tags = set(tags)
 
-        return tags
+        if len(unique_tags) != len(tags):
+            raise serializers.ValidationError(
+                {'tags': 'Tag should be provided only once'}
+            )
+
+        return list(unique_tags)
 
     def validate(self, data):
         ingredients_data = self.initial_data.get('ingredients')
