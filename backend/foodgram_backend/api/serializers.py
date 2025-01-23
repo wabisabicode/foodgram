@@ -142,13 +142,26 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
         ]
 
 
+class RecipeIngredientSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        source='ingredient.id', read_only=True)
+    name = serializers.CharField(source='ingredient.name', read_only=True)
+    measurement_unit = serializers.CharField(
+        source='ingredient.measurement_unit', read_only=True)
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ['id', 'name', 'measurement_unit', 'amount']
+
+
 class RecipeReadSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField(required=True, allow_null=True)
     author = CustomUserSerializer(read_only=True)
     tags = TagReadSerializer(many=True)
-    ingredients = serializers.SerializerMethodField()
+    ingredients = RecipeIngredientSerializer(
+        many=True, source='recipeingredients')
 
     class Meta:
         model = Recipe
@@ -167,14 +180,14 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         return ShoppingCartItem.objects.filter(
             user=request.user, recipe=obj).exists()
 
-    def get_ingredients(self, obj):
-        recipe_ingredients = RecipeIngredient.objects.filter(recipe=obj)
-        return [{
-            'id': ri.ingredient.id,
-            'name': ri.ingredient.name,
-            'measurement_unit': ri.ingredient.measurement_unit,
-            'amount': ri.amount,
-        } for ri in recipe_ingredients]
+    # def get_ingredients(self, obj):
+    #     recipe_ingredients = RecipeIngredient.objects.filter(recipe=obj)
+    #     return [{
+    #         'id': ri.ingredient.id,
+    #         'name': ri.ingredient.name,
+    #         'measurement_unit': ri.ingredient.measurement_unit,
+    #         'amount': ri.amount,
+    #     } for ri in recipe_ingredients]
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
