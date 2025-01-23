@@ -180,15 +180,6 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         return ShoppingCartItem.objects.filter(
             user=request.user, recipe=obj).exists()
 
-    # def get_ingredients(self, obj):
-    #     recipe_ingredients = RecipeIngredient.objects.filter(recipe=obj)
-    #     return [{
-    #         'id': ri.ingredient.id,
-    #         'name': ri.ingredient.name,
-    #         'measurement_unit': ri.ingredient.measurement_unit,
-    #         'amount': ri.amount,
-    #     } for ri in recipe_ingredients]
-
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True, allow_null=True)
