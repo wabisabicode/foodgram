@@ -41,6 +41,6 @@ class Subscription(models.Model):
                                     name='unique_subscription'),
             models.CheckConstraint(check=~models.Q(
                 subscriber=models.F('creator')),
-                name='%(app_label)s_%(class)s_no_selffollow'
+                name='users_no_selffollow'
             )
         ]
