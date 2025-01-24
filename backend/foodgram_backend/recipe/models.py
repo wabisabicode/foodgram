@@ -69,12 +69,6 @@ class Recipe(models.Model):
     pub_date = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата публикации')
 
-    @admin.display(
-        description='Добавлений в избранное',
-    )
-    def favorites_count(self):
-        return self.favorites.count()
-
     class Meta:
         default_related_name = 'recipes'
         verbose_name = 'Рецепт'

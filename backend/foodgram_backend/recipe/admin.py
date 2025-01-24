@@ -20,6 +20,10 @@ class RecipeAdmin(admin.ModelAdmin):
         RecipeIngredientInline,
     )
 
+    @admin.display(description='Добавлений в избранное',)
+    def favorites_count(self):
+        return self.favorites.count()
+
 
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('name', 'measurement_unit')
