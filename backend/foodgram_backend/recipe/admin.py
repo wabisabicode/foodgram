@@ -1,13 +1,8 @@
 from django.contrib import admin
 
-from .models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag
+from .models import Ingredient, Recipe, RecipeIngredient, Tag
 
 admin.site.register(Tag)
-
-
-class RecipeTagInline(admin.TabularInline):
-    model = RecipeTag
-    extra = 0
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -22,8 +17,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_filter = ('tags',)
 
     inlines = (
-        RecipeTagInline,
-        RecipeIngredientInline
+        RecipeIngredientInline,
     )
 
 

@@ -4,7 +4,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from common.constants import (INGR_NAME_MAX_LENGTH, INGR_UNIT_MAX_LENGTH,
-                              MAX_COOKING_TIME, MIN_COOKING_TIME,
+                              MAX_COOKING_TIME, MAX_INGREDIENT_AMOUNT,
+                              MIN_COOKING_TIME, MIN_INGREDIENT_AMOUNT,
                               RECIPE_NAME_MAX_LENGTH, SHORT_URL_MAX_LENGTH,
                               TAG_MAX_LENGTH)
 from common.help_functions import generate_random_filename
@@ -47,6 +48,7 @@ class Recipe(models.Model):
     image = models.ImageField(
         upload_to='recipes/images', verbose_name='Изображение')
     text = models.TextField(verbose_name='Текст')
+
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
         validators=[
@@ -56,14 +58,9 @@ class Recipe(models.Model):
     )
     author = models.ForeignKey(
         FGUser, verbose_name='Автор',
-        on_delete=models.CASCADE,
-        related_name='recipes'
+        on_delete=models.CASCADE
     )
-    tags = models.ManyToManyField(
-        Tag,
-        through='RecipeTag',
-        verbose_name='Тег'
-    )
+    tags = models.ManyToManyField(Tag, verbose_name='Тег')
     ingredients = models.ManyToManyField(
         Ingredient,
         through='RecipeIngredient',
@@ -79,6 +76,7 @@ class Recipe(models.Model):
         return self.favorites.count()
 
     class Meta:
+        default_related_name = 'recipes'
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         ordering = ('-pub_date',)
@@ -87,34 +85,24 @@ class Recipe(models.Model):
         return self.name
 
 
-class RecipeTag(models.Model):
-    recipe = models.ForeignKey(
-        'Recipe', verbose_name='Рецепт', on_delete=models.CASCADE)
-    tag = models.ForeignKey(
-        'Tag', verbose_name='Тег', on_delete=models.CASCADE)
-
-    class Meta:
-        verbose_name = 'Связь рецепта и тега'
-        verbose_name_plural = 'Связи рецепта и тега'
-
-    def __str__(self):
-        return self.tag.name
-
-
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         'Recipe', verbose_name='Рецепт',
-        on_delete=models.CASCADE,
-        related_name='recipeingredients')
+        on_delete=models.CASCADE
+    )
     ingredient = models.ForeignKey(
         'Ingredient', verbose_name='Ингредиент', on_delete=models.CASCADE)
     amount = models.IntegerField(
         verbose_name='Количество в рецепте',
-        validators=[MinValueValidator(1)],
+        validators=[
+            MaxValueValidator(MAX_INGREDIENT_AMOUNT),
+            MinValueValidator(MIN_INGREDIENT_AMOUNT)
+        ],
         default=1
     )
 
     class Meta:
+        default_related_name = 'recipeingredients'
         verbose_name = 'Связь рецепта и ингредиента'
         verbose_name_plural = 'Связи рецепта и ингредиента'
 
