@@ -6,16 +6,25 @@ from common.constants import EMAIL_MAX_LENGTH, NAME_MAX_LENGTH
 
 
 class FGUser(AbstractUser):
-    email = models.EmailField(max_length=EMAIL_MAX_LENGTH, blank=False)
-    first_name = models.CharField(max_length=NAME_MAX_LENGTH, blank=False)
-    last_name = models.CharField(max_length=NAME_MAX_LENGTH, blank=False)
+    email = models.EmailField(
+        verbose_name='Имейл',
+        max_length=EMAIL_MAX_LENGTH,
+        blank=False,
+        unique=True
+    )
+    first_name = models.CharField(
+        verbose_name='Имя', max_length=NAME_MAX_LENGTH, blank=False)
+    last_name = models.CharField(
+        verbose_name='Фамилия', max_length=NAME_MAX_LENGTH, blank=False)
 
     username = models.CharField(
+        verbose_name='Имя пользователя',
         unique=True,
         max_length=NAME_MAX_LENGTH,
         validators=[RegexValidator(regex=r'^[\w.@+-]+\Z')])
 
-    avatar = models.ImageField(upload_to='users/avatars', default='')
+    avatar = models.ImageField(
+        verbose_name='Аватар', upload_to='users/avatars', default='')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
