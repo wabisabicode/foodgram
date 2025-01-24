@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
 
@@ -19,8 +20,8 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = ('name', 'cooking_time_with_unit', 'author',
                     'favorites_count', 'tags_list', 'ingredients_list')
     readonly_fields = ('favorites_count',)
-    search_fields = ('name', 'author')
-    list_filter = ('tags',)
+    search_fields = ('name', 'author', 'tags')
+    list_filter = ('tags', 'author')
 
     inlines = (
         RecipeIngredientInline,
@@ -43,6 +44,11 @@ class RecipeAdmin(admin.ModelAdmin):
     def cooking_time_with_unit(self, obj):
         return f'{obj.cooking_time}'
     cooking_time_with_unit.short_description = 'Время приготовления (мин)'
+
+    def save_model(self, request, obj, form, change):
+        if not obj.recipeingredients.exists():
+            raise ValidationError('Добавьте хотя бы один ингредиент')
+        super().save_model(request, obj, form, change)
 
 
 class IngredientAdmin(admin.ModelAdmin):
