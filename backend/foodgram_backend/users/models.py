@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db import models
 
 from common.constants import EMAIL_MAX_LENGTH, NAME_MAX_LENGTH
@@ -9,10 +10,10 @@ class FGUser(AbstractUser):
     first_name = models.CharField(max_length=NAME_MAX_LENGTH, blank=False)
     last_name = models.CharField(max_length=NAME_MAX_LENGTH, blank=False)
 
-    username = models.CharField(unique=True, max_length=NAME_MAX_LENGTH)
+    username = models.CharField(unique=True, max_length=NAME_MAX_LENGTH,
+                                validators=[RegexValidator])
 
-    # is_subscribed = models.BooleanField()
-    avatar = models.ImageField(upload_to='users/avatars')
+    avatar = models.ImageField(upload_to='users/avatars', default='')
 
     class Meta:
         verbose_name = 'Пользователь'
