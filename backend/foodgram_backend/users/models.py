@@ -10,8 +10,10 @@ class FGUser(AbstractUser):
     first_name = models.CharField(max_length=NAME_MAX_LENGTH, blank=False)
     last_name = models.CharField(max_length=NAME_MAX_LENGTH, blank=False)
 
-    username = models.CharField(unique=True, max_length=NAME_MAX_LENGTH,
-                                validators=[RegexValidator])
+    username = models.CharField(
+        unique=True,
+        max_length=NAME_MAX_LENGTH,
+        validators=[RegexValidator(regex=r'^[\w.@+-]+\Z')])
 
     avatar = models.ImageField(upload_to='users/avatars', default='')
 
