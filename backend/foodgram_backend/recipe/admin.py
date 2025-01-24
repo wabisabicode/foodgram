@@ -2,7 +2,12 @@ from django.contrib import admin
 
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
 
-admin.site.register(Tag)
+tags_intermedate_model = Recipe.tags.through
+
+
+@admin.register(tags_intermedate_model)
+class TagsIntermediateAdmin(admin.ModelAdmin):
+    list_display = ('id', 'recipe', 'tag')
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -11,7 +16,8 @@ class RecipeIngredientInline(admin.TabularInline):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author', 'favorites_count')
+    list_display = ('name', 'cooking_time', 'author',
+                    'favorites_count')
     readonly_fields = ('favorites_count',)
     search_fields = ('name', 'author')
     list_filter = ('tags',)
@@ -21,8 +27,8 @@ class RecipeAdmin(admin.ModelAdmin):
     )
 
     @admin.display(description='Добавлений в избранное',)
-    def favorites_count(self):
-        return self.favorites.count()
+    def favorites_count(self, obj):
+        return obj.favorites.count()
 
 
 class IngredientAdmin(admin.ModelAdmin):
@@ -31,5 +37,6 @@ class IngredientAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 
+admin.site.register(Tag)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
