@@ -92,7 +92,7 @@ class RecipeIngredient(models.Model):
     )
     ingredient = models.ForeignKey(
         'Ingredient', verbose_name='Ингредиент', on_delete=models.CASCADE)
-    amount = models.IntegerField(
+    amount = models.PositiveSmallIntegerField(
         verbose_name='Количество в рецепте',
         validators=[
             MaxValueValidator(MAX_INGREDIENT_AMOUNT),
