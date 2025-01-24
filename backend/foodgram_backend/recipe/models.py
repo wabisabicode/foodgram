@@ -1,11 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from common.constants import (INGR_NAME_MAX_LENGTH, INGR_UNIT_MAX_LENGTH,
-                              MIN_COOKING_TIME, RECIPE_NAME_MAX_LENGTH,
-                              SHORT_URL_MAX_LENGTH, TAG_MAX_LENGTH)
+                              MAX_COOKING_TIME, MIN_COOKING_TIME,
+                              RECIPE_NAME_MAX_LENGTH, SHORT_URL_MAX_LENGTH,
+                              TAG_MAX_LENGTH)
 from common.help_functions import generate_random_filename
 from users.models import FGUser
 
@@ -46,9 +47,13 @@ class Recipe(models.Model):
     image = models.ImageField(
         upload_to='recipes/images', verbose_name='Изображение')
     text = models.TextField(verbose_name='Текст')
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
-        validators=[MinValueValidator(MIN_COOKING_TIME)])
+        validators=[
+            MaxValueValidator(MAX_COOKING_TIME),
+            MinValueValidator(MIN_COOKING_TIME)
+        ]
+    )
     author = models.ForeignKey(
         FGUser, verbose_name='Автор',
         on_delete=models.CASCADE,
