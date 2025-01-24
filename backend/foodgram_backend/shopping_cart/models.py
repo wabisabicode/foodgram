@@ -35,6 +35,10 @@ class ShoppingCartItem(models.Model):
     class Meta:
         verbose_name = 'Элемент в корзине'
         verbose_name_plural = 'Элементы в корзине'
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'recipe'],
+                                    name='unique_recipe_in_users_cart'),
+        ]
 
     def __str__(self):
         return self.name
