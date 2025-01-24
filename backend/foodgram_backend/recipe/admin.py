@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.core.exceptions import ValidationError
 
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
 
@@ -45,15 +44,16 @@ class RecipeAdmin(admin.ModelAdmin):
         return f'{obj.cooking_time}'
     cooking_time_with_unit.short_description = 'Время приготовления (мин)'
 
-    def save_model(self, request, obj, form, change):
-        if not obj.recipeingredients.exists():
-            raise ValidationError('Добавьте хотя бы один ингредиент')
-        super().save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     if not obj.recipeingredients.exists():
+    #         raise ValidationError('Добавьте хотя бы один ингредиент')
+    #     super().save_model(request, obj, form, change)
 
 
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('name', 'measurement_unit')
-    search_fields = ('name',)
+    search_fields = ('name', 'measurement_unit')
+    list_filter = ('measurement_unit',)
     ordering = ('name',)
 
 
