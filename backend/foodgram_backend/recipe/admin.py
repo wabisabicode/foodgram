@@ -16,8 +16,8 @@ class RecipeIngredientInline(admin.TabularInline):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'cooking_time', 'author',
-                    'favorites_count', 'tags_list')
+    list_display = ('name', 'cooking_time_with_unit', 'author',
+                    'favorites_count', 'tags_list', 'ingredients_list')
     readonly_fields = ('favorites_count',)
     search_fields = ('name', 'author')
     list_filter = ('tags',)
@@ -33,6 +33,16 @@ class RecipeAdmin(admin.ModelAdmin):
     def tags_list(self, obj):
         return ', '.join([tag.name for tag in obj.tags.all()])
     tags_list.short_description = 'Теги'
+
+    def ingredients_list(self, obj):
+        return ", ".join(
+            [ri.ingredient.name for ri in obj.recipeingredients.all()]
+        )
+    ingredients_list.short_description = 'Ингредиенты'
+
+    def cooking_time_with_unit(self, obj):
+        return f'{obj.cooking_time}'
+    cooking_time_with_unit.short_description = 'Время приготовления (мин)'
 
 
 class IngredientAdmin(admin.ModelAdmin):
