@@ -201,11 +201,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            if favorite.exists():
-                favorite.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+            deleted, _ = Favorite.objects.filter(
+                user=user, recipe=recipe).delete()
+            if not deleted:
+                raise ValidationError('Recipe not in favorites')
 
     @action(methods=['POST', 'DELETE'], detail=True, url_path='shopping_cart')
     def toggle_shopping_cart_item(self, request, pk):
@@ -221,17 +220,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            shopping_cart_item = ShoppingCartItem.objects.create(
-                recipe=recipe, user=user)
+            ShoppingCartItem.objects.create(recipe=recipe, user=user)
             serializer = ShortRecipeSerializer(recipe)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            if shopping_cart_item.exists():
-                shopping_cart_item.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+            deleted, _ = ShoppingCartItem.objects.filter(
+                user=user, recipe=recipe).delete()
+            if not deleted:
+                raise ValidationError('Recipe not in shopping cart')
 
 
 @api_view(['GET'])
@@ -261,8 +259,6 @@ def download_shopping_cart(request):
         shopping_list_items,
         headers={
             "Content-Type": "text/plain",
-            # "Content-Type": "text/csv",
-            # "Content-Type": "application/pdf",
             "Content-Disposition": 'attachment; filename="shopping_list.txt"',
         },
     )
