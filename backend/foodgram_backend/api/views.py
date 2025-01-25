@@ -87,11 +87,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return self.get_paginated_response(serializer.data)
 
-
-class MeView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
+    @action(methods=['GET'], detail=False, url_path='me',
+            permission_classes=[IsAuthenticated])
+    def me_page(self, request):
         user = request.user
         serializer = CustomUserSerializer(user, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
