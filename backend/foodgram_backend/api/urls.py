@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from .views import (IngredientListRetrieveViewSet, RecipeViewSet,
-                    SetPasswordView, TagListRetrieveViewSet, UserViewSet,
+                    TagListRetrieveViewSet, UserViewSet,
                     download_shopping_cart)
 
 app_name = 'api'
@@ -15,8 +15,6 @@ router_v1.register(
 router_v1.register('recipes', RecipeViewSet, basename='recipes')
 
 urlpatterns = [
-    path('users/set_password/',
-         SetPasswordView.as_view(), name='set-password'),
     path('auth/', include('djoser.urls.authtoken')),
     path('recipes/download_shopping_cart/',
          download_shopping_cart, name='download-shopping-cart'),
