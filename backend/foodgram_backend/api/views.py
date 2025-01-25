@@ -32,7 +32,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     pagination_class = PageLimitPagination
-    http_method_names = ['get', 'post', 'delete']
+    http_method_names = ['get', 'post', 'delete', 'put']
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -94,6 +94,28 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = CustomUserSerializer(user, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(methods=['PUT'], detail=False, url_path='me/avatar',
+            permission_classes=[IsAuthenticated])
+    def avatar(self, request):
+        serializer = AvatarSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+
+        user.avatar = serializer.validated_data.get('avatar')
+        user.save()
+
+        avatar_url = serializer.get_avatar_url(user)
+
+        return Response({'avatar': avatar_url}, status=status.HTTP_200_OK)
+
+    @avatar.mapping.delete
+    def delete_avatar(self, request):
+        user = request.user
+        user.avatar.delete()
+        user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class SetPasswordView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -115,30 +137,6 @@ class SetPasswordView(APIView):
 
         return Response('Password has been changed',
                         status=status.HTTP_204_NO_CONTENT)
-
-
-class AvatarView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def put(self, request):
-        serializer = AvatarSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        user = request.user
-
-        user.avatar = serializer.validated_data.get('avatar')
-        user.save()
-
-        avatar_url = serializer.get_avatar_url(user)
-
-        return Response({'avatar': avatar_url}, status=status.HTTP_200_OK)
-
-    def delete(self, request):
-        user = request.user
-
-        user.avatar.delete()
-        user.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TagListRetrieveViewSet(ReadOnlyModelViewSet):
