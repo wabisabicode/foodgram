@@ -115,7 +115,8 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(methods=['POST'], detail=False, url_path='set_password')
+    @action(methods=['POST'], detail=False, url_path='set_password',
+            permission_classes=[IsAuthenticated])
     def set_password(self, request):
         serializer = SetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
