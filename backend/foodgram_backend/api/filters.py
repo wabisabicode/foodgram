@@ -1,53 +1,49 @@
-from rest_framework import filters
+from django_filters import rest_framework as filters
 
 from recipe.models import Ingredient, Recipe
 
 
-class TagsFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        tags = request.query_params.getlist('tags', [])
+class IngredientFilter(filters.FilterSet):
+    name = filters.CharFilter(method='filter_by_name', label="Name")
 
+    class Meta:
+        model = Ingredient
+        fields = ['name']
+
+    def filter_by_name(self, queryset, name, value):
+        if value:
+            return queryset.filter(name__startswith=value.lower())
+        return queryset
+
+
+class RecipeFilter(filters.FilterSet):
+    tags = filters.CharFilter(method='filter_tags')
+    is_favorited = filters.BooleanFilter(
+        method='filter_favorites')
+    is_in_shopping_cart = filters.BooleanFilter(
+        method='filter_shopping_cart')
+    author = filters.NumberFilter(field_name='author__id')
+
+    class Meta:
+        model = Recipe
+        fields = ['tags', 'is_favorited', 'is_in_shopping_cart']
+
+    def filter_tags(self, queryset, name, value):
+        tags = self.request.query_params.getlist('tags', [])
         if tags:
             return queryset.filter(tags__slug__in=tags).distinct()
-
         return queryset
 
-
-class IngredientFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        lookup_value = request.query_params.get('name', None)
-
-        if lookup_value is not None:
-            ingredients = Ingredient.objects.filter(
-                name__startswith=lookup_value.lower())
-            return ingredients
-
-        return queryset
-
-
-class FavoritesFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        is_favorited = request.query_params.get('is_favorited', None)
-
-        if is_favorited is not None:
-            if not request.user.is_authenticated:
+    def filter_favorites(self, queryset, name, value):
+        if value:
+            if not self.request.user.is_authenticated:
                 return queryset.none()
-            recipes = Recipe.objects.filter(favorites__user=request.user)
-            return recipes
-
+            return queryset.filter(favorites__user=self.request.user)
         return queryset
 
-
-class ShoppingCartFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        is_in_shopping_cart = request.query_params.get(
-            'is_in_shopping_cart', None)
-
-        if is_in_shopping_cart is not None:
-            if not request.user.is_authenticated:
+    def filter_shopping_cart(self, queryset, name, value):
+        if value:
+            if not self.request.user.is_authenticated:
                 return queryset.none()
-            recipes = Recipe.objects.filter(
-                shopping_cart_items__user=request.user)
-            return recipes
-
+            return queryset.filter(shopping_cart_items__user=self.request.user)
         return queryset

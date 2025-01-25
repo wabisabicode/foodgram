@@ -16,8 +16,7 @@ from recipe.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
 from shopping_cart.models import ShoppingCartItem
 from users.models import Subscription
 
-from .filters import (FavoritesFilterBackend, IngredientFilterBackend,
-                      ShoppingCartFilterBackend, TagsFilterBackend)
+from .filters import IngredientFilter, RecipeFilter
 from .pagination import PageLimitPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (AvatarSerializer, CreatorSerializer,
@@ -191,7 +190,7 @@ class IngredientListRetrieveViewSet(mixins.ListModelMixin,
                                     viewsets.GenericViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (IngredientFilterBackend,)
+    filterset_class = IngredientFilter
     pagination_class = None
 
 
@@ -199,9 +198,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrReadOnly, IsAuthenticatedOrReadOnly)
     serializer_class = RecipeWriteSerializer
-    filter_backends = (DjangoFilterBackend, TagsFilterBackend,
-                       FavoritesFilterBackend, ShoppingCartFilterBackend)
-    filterset_fields = ('author', 'tags__slug')
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
     pagination_class = PageLimitPagination
 
     @action(detail=True, url_path='get-link')
