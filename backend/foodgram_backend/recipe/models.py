@@ -114,6 +114,10 @@ class RecipeShortURL(models.Model):
     hash = models.CharField(
         max_length=SHORT_URL_MAX_LENGTH, verbose_name='Хеш')
 
+    class Meta:
+        verbose_name = 'Короткая ссылка'
+        verbose_name_plural = 'Короткие ссылки'
+
     def generate_hash(self):
         self.hash = generate_random_filename(length=8)
         self.save()
@@ -125,6 +129,8 @@ class Favorite(models.Model):
     user = models.ForeignKey(FGUser, on_delete=models.CASCADE)
 
     class Meta:
+        verbose_name = 'Отметка "Избранное"'
+        verbose_name_plural = 'Отметки "Избранное"'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'recipe'],

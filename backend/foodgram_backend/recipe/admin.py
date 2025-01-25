@@ -1,13 +1,22 @@
 from django.contrib import admin
 
-from .models import Ingredient, Recipe, RecipeIngredient, Tag
+from .models import (Favorite, Ingredient, Recipe,
+                     RecipeIngredient, RecipeShortURL, Tag)
 
-tags_intermedate_model = Recipe.tags.through
+RecipeTag = Recipe.tags.through
 
 
-@admin.register(tags_intermedate_model)
+@admin.register(RecipeTag)
 class TagsIntermediateAdmin(admin.ModelAdmin):
-    list_display = ('id', 'recipe', 'tag')
+    list_display = ('id', 'custom_recipe', 'custom_tag')
+
+    def custom_recipe(self, obj):
+        return obj.recipe.name
+    custom_recipe.short_description = 'рецепт'
+
+    def custom_tag(self, obj):
+        return obj.tag.name
+    custom_tag.short_description = 'тег'
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -57,6 +66,21 @@ class IngredientAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 
+class RecipeIngredientAdmin(admin.ModelAdmin):
+    list_display = ('recipe', 'ingredient', 'amount')
+
+
+class RecipeShortURLAdmin(admin.ModelAdmin):
+    list_display = ('recipe', 'hash')
+
+
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ('recipe', 'user')
+
+
 admin.site.register(Tag)
+admin.site.register(Favorite, FavoriteAdmin)
 admin.site.register(Recipe, RecipeAdmin)
+admin.site.register(RecipeShortURL, RecipeShortURLAdmin)
+admin.site.register(RecipeIngredient, RecipeIngredientAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
