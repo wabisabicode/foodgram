@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                     RecipeShortURL, Tag)
+                     RecipeShortURL, ShoppingCartItem, Tag)
 
 RecipeTag = Recipe.tags.through
 
@@ -78,9 +78,14 @@ class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('recipe', 'user')
 
 
+class ShoppingCartItemAdmin(admin.ModelAdmin):
+    list_display = ('recipe', 'user')
+
+
 admin.site.register(Tag)
 admin.site.register(Favorite, FavoriteAdmin)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(RecipeShortURL, RecipeShortURLAdmin)
 admin.site.register(RecipeIngredient, RecipeIngredientAdmin)
+admin.site.register(ShoppingCartItem, ShoppingCartItemAdmin)
 admin.site.register(Ingredient, IngredientAdmin)

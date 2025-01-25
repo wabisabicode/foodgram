@@ -6,8 +6,7 @@ from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from common.constants import EMAIL_MAX_LENGTH, NAME_MAX_LENGTH
 from recipe.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                           RecipeShortURL, Tag)
-from shopping_cart.models import ShoppingCartItem
+                           RecipeShortURL, ShoppingCartItem, Tag)
 from users.models import Subscription
 
 from .fields import Base64ImageField
