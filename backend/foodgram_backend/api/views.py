@@ -9,6 +9,7 @@ from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from recipe.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                            RecipeShortURL, Tag)
@@ -146,17 +147,13 @@ class AvatarView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TagListRetrieveViewSet(mixins.ListModelMixin,
-                             mixins.RetrieveModelMixin,
-                             viewsets.GenericViewSet):
+class TagListRetrieveViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagReadSerializer
     pagination_class = None
 
 
-class IngredientListRetrieveViewSet(mixins.ListModelMixin,
-                                    mixins.RetrieveModelMixin,
-                                    viewsets.GenericViewSet):
+class IngredientListRetrieveViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filterset_class = IngredientFilter
