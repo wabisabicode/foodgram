@@ -147,7 +147,8 @@ class IngredientListRetrieveViewSet(ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.all()
+    queryset = Recipe.objects.select_related(
+        'author').prefetch_related('ingredients', 'tags')
     permission_classes = (IsAuthorOrReadOnly, IsAuthenticatedOrReadOnly)
     serializer_class = RecipeWriteSerializer
     filter_backends = (DjangoFilterBackend,)
@@ -169,7 +170,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(methods=['POST', 'DELETE'], detail=True, url_path='favorite')
     def set_favorite(self, request, pk=None):
         user = request.user
-        recipe = get_object_or_404(Recipe, pk=pk)
+        recipe = get_object_or_404(self.get_queryset(), pk=pk)
         favorite = Favorite.objects.filter(recipe=recipe, user=request.user)
 
         if request.method == 'POST':
@@ -192,7 +193,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(methods=['POST', 'DELETE'], detail=True, url_path='shopping_cart')
     def toggle_shopping_cart_item(self, request, pk):
         user = request.user
-        recipe = get_object_or_404(Recipe, pk=pk)
+        recipe = get_object_or_404(self.get_queryset(), pk=pk)
         shopping_cart_item = ShoppingCartItem.objects.filter(
             user=user, recipe=recipe)
 
