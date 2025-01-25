@@ -169,51 +169,35 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(methods=['POST', 'DELETE'], detail=True, url_path='favorite')
     def set_favorite(self, request, pk=None):
-        user = request.user
-        recipe = get_object_or_404(self.get_queryset(), pk=pk)
-        favorite = Favorite.objects.filter(recipe=recipe, user=user)
-
-        if request.method == 'POST':
-            if favorite.exists():
-                return Response(
-                    {'detail': 'Cannot add to the favorites twice'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            favorite = Favorite.objects.create(recipe=recipe, user=user)
-            serializer = ShortRecipeSerializer(recipe)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        if request.method == 'DELETE':
-            deleted, _ = favorite.delete()
-            if not deleted:
-                raise ValidationError('Recipe not in favorites')
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        return self.toggle_parameter(request, Favorite, pk)
 
     @action(methods=['POST', 'DELETE'], detail=True, url_path='shopping_cart')
     def toggle_shopping_cart_item(self, request, pk):
+        return self.toggle_parameter(request, ShoppingCartItem, pk)
+
+    def toggle_parameter(self, request, Model, pk):
         user = request.user
         recipe = get_object_or_404(self.get_queryset(), pk=pk)
-        shopping_cart_item = ShoppingCartItem.objects.filter(
-            user=user, recipe=recipe)
+        object = Model.objects.filter(user=user, recipe=recipe)
 
         if request.method == 'POST':
-            if shopping_cart_item.exists():
+            if object.exists():
                 return Response(
-                    {'detail': 'Cannot add to the shopping cart twice'},
+                    {'detail': 'Cannot select object twice'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            ShoppingCartItem.objects.create(recipe=recipe, user=user)
+            Model.objects.create(recipe=recipe, user=user)
             serializer = ShortRecipeSerializer(recipe)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            deleted, _ = shopping_cart_item.delete()
+            deleted, _ = object.delete()
             if not deleted:
                 raise ValidationError('Recipe not in shopping cart')
             return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 
 @api_view(['GET'])
