@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import (Favorite, Ingredient, Recipe,
-                     RecipeIngredient, RecipeShortURL, Tag)
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                     RecipeShortURL, Tag)
 
 RecipeTag = Recipe.tags.through
 
