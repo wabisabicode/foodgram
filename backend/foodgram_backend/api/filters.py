@@ -4,16 +4,11 @@ from recipe.models import Ingredient, Recipe
 
 
 class IngredientFilter(filters.FilterSet):
-    name = filters.CharFilter(method='filter_by_name', label="Name")
+    name = filters.CharFilter(field_name='name', lookup_expr='istartswith')
 
     class Meta:
         model = Ingredient
         fields = ['name']
-
-    def filter_by_name(self, queryset, name, value):
-        if value:
-            return queryset.filter(name__startswith=value.lower())
-        return queryset
 
 
 class RecipeFilter(filters.FilterSet):
