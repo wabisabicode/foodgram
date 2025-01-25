@@ -171,7 +171,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def set_favorite(self, request, pk=None):
         user = request.user
         recipe = get_object_or_404(self.get_queryset(), pk=pk)
-        favorite = Favorite.objects.filter(recipe=recipe, user=request.user)
+        favorite = Favorite.objects.filter(recipe=recipe, user=user)
 
         if request.method == 'POST':
             if favorite.exists():
@@ -185,10 +185,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            deleted, _ = Favorite.objects.filter(
-                user=user, recipe=recipe).delete()
+            deleted, _ = favorite.delete()
             if not deleted:
                 raise ValidationError('Recipe not in favorites')
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['POST', 'DELETE'], detail=True, url_path='shopping_cart')
     def toggle_shopping_cart_item(self, request, pk):
@@ -210,10 +210,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            deleted, _ = ShoppingCartItem.objects.filter(
-                user=user, recipe=recipe).delete()
+            deleted, _ = shopping_cart_item.delete()
             if not deleted:
                 raise ValidationError('Recipe not in shopping cart')
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])
