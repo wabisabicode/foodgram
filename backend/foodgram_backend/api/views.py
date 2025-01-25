@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -10,8 +11,7 @@ from rest_framework.permissions import (AllowAny, IsAuthenticated,
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from recipe.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                           RecipeShortURL, Tag)
+from recipe.models import Favorite, Ingredient, Recipe, RecipeShortURL, Tag
 from shopping_cart.models import ShoppingCartItem
 from users.models import Subscription
 
@@ -202,24 +202,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def download_shopping_cart(request):
-    cart_recipes = Recipe.objects.filter(
-        shopping_cart_items__user=request.user)
-
-    shopping_list = {}
-    for recipe in cart_recipes:
-        for ingredient in recipe.ingredients.all():
-            recipe_ingredient = get_object_or_404(
-                RecipeIngredient, ingredient=ingredient, recipe=recipe)
-            amount = recipe_ingredient.amount
-            measurement_unit = recipe_ingredient.ingredient.measurement_unit
-            if ingredient.name in shopping_list.keys():
-                shopping_list[ingredient.name][0] += amount
-            else:
-                shopping_list[ingredient.name] = [amount, measurement_unit]
+    ingredients = (
+        Ingredient.objects.filter(
+            recipes__shopping_cart_items__user=request.user)
+        .annotate(total_amount=Sum('recipeingredients__amount'))
+        .values('name', 'measurement_unit', 'total_amount')
+    )
 
     shopping_list_items = '\n'.join(
-        f'{item}: {amount} {unit}'
-        for item, (amount, unit) in shopping_list.items()
+        f'{ingredient["name"]}: {
+            ingredient["total_amount"]} {ingredient["measurement_unit"]}'
+        for ingredient in ingredients
     )
 
     return HttpResponse(
