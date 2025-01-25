@@ -3,9 +3,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status, viewsets
-from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
@@ -23,8 +22,7 @@ from .serializers import (AvatarSerializer, CreatorSerializer,
                           CustomUserCreateSerializer, CustomUserSerializer,
                           IngredientSerializer, RecipeShortURLSerializer,
                           RecipeWriteSerializer, SetPasswordSerializer,
-                          ShortRecipeSerializer, TagReadSerializer,
-                          TokenCreateSerializer)
+                          ShortRecipeSerializer, TagReadSerializer)
 
 User = get_user_model()
 
@@ -122,35 +120,6 @@ class SetPasswordView(APIView):
 
         return Response('Password has been changed',
                         status=status.HTTP_204_NO_CONTENT)
-
-
-class TokenCreateView(APIView):
-
-    def post(self, request):
-        serializer = TokenCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        email = serializer.validated_data.get('email')
-        password = serializer.validated_data.get('password')
-
-        user = get_object_or_404(User, email=email)
-
-        if not user.check_password(password):
-            raise AuthenticationFailed('Invalid credentials')
-
-        token, created = Token.objects.get_or_create(user=user)
-
-        return Response({'auth_token': str(token)}, status=status.HTTP_200_OK)
-
-
-class TokenLogoutView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        token = Token.objects.get(user=request.user)
-        token.delete()
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AvatarView(APIView):
