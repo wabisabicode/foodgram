@@ -74,22 +74,18 @@ class UserViewSet(viewsets.ModelViewSet):
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
-class MySubscriptions(APIView):
-    permission_classes = (IsAuthenticated,)
-    pagination_class = PageLimitPagination
-
-    def get(self, request):
+    @action(methods=['GET'], detail=False, url_path='subscriptions',
+            permission_classes=[IsAuthenticated])
+    def get_mysubscriptions(self, request):
         subscriptions = request.user.following.all()
         creators = [subscription.creator for subscription in subscriptions]
 
-        paginator = self.pagination_class()
-        result_page = paginator.paginate_queryset(creators, request)
+        result_page = self.paginate_queryset(creators)
 
         serializer = CreatorSerializer(
             result_page, context={'request': request}, many=True)
 
-        return paginator.get_paginated_response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
 
 class MeView(APIView):

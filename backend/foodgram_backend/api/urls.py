@@ -2,9 +2,8 @@ from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from .views import (AvatarView, IngredientListRetrieveViewSet, MeView,
-                    MySubscriptions, RecipeViewSet, SetPasswordView,
-                    TagListRetrieveViewSet, UserViewSet,
-                    download_shopping_cart)
+                    RecipeViewSet, SetPasswordView, TagListRetrieveViewSet,
+                    UserViewSet, download_shopping_cart)
 
 app_name = 'api'
 
@@ -20,8 +19,6 @@ urlpatterns = [
     path('users/me/avatar/', AvatarView.as_view(), name='users-avatar'),
     path('users/set_password/',
          SetPasswordView.as_view(), name='set-password'),
-    path('users/subscriptions/',
-         MySubscriptions.as_view(), name='my-subscriptions'),
     path('auth/', include('djoser.urls.authtoken')),
     path('recipes/download_shopping_cart/',
          download_shopping_cart, name='download-shopping-cart'),
