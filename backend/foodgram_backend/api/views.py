@@ -210,9 +210,9 @@ def download_shopping_cart(request):
     )
 
     shopping_list_items = '\n'.join(
-        f'{ingredient["name"]}: '
-        f'{ingredient["total_amount"]} '
-        f'{ingredient["measurement_unit"]}'
+        f'{ingredient['name']}: '
+        f'{ingredient['total_amount']} '
+        f'{ingredient['measurement_unit']}'
         for ingredient in ingredients
     )
 

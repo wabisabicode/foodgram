@@ -44,7 +44,7 @@ class RecipeAdmin(admin.ModelAdmin):
     tags_list.short_description = 'Теги'
 
     def ingredients_list(self, obj):
-        return ", ".join(
+        return ', '.join(
             [ri.ingredient.name for ri in obj.recipeingredients.all()]
         )
     ingredients_list.short_description = 'Ингредиенты'
