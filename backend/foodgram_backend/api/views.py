@@ -29,17 +29,22 @@ User = get_user_model()
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     pagination_class = PageLimitPagination
-    http_method_names = ['get', 'post', 'delete', 'put']
 
     def get_serializer_class(self):
         if self.action == 'create':
             return CustomUserCreateSerializer
         return CustomUserSerializer
 
-    @action(methods=['POST', 'DELETE'], detail=True, url_path='subscribe',
-            permission_classes=[IsAuthorOrReadOnly, IsAuthenticated])
+    def get_permissions(self):
+        if self.action in ['create', 'list', 'retrieve']:
+            return [AllowAny()]
+        if self.action == 'toggle_subscription':
+            return [IsAuthorOrReadOnly(), IsAuthenticated()]
+        return super().get_permissions()
+
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='subscribe')
     def toggle_subscription(self, request, pk=None):
         subscriber = request.user
         creator = get_object_or_404(User, pk=pk)
@@ -73,12 +78,10 @@ class UserViewSet(viewsets.ModelViewSet):
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['GET'], detail=False, url_path='subscriptions',
-            permission_classes=[IsAuthenticated])
+    @action(methods=['GET'], detail=False, url_path='subscriptions')
     def get_mysubscriptions(self, request):
         subscriptions = request.user.following.all()
         creators = [subscription.creator for subscription in subscriptions]
-
         result_page = self.paginate_queryset(creators)
 
         serializer = CreatorSerializer(
@@ -86,26 +89,22 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return self.get_paginated_response(serializer.data)
 
-    @action(methods=['GET'], detail=False, url_path='me',
-            permission_classes=[IsAuthenticated])
+    @action(methods=['GET'], detail=False, url_path='me')
     def me_page(self, request):
         user = request.user
         serializer = CustomUserSerializer(user, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(methods=['PUT'], detail=False, url_path='me/avatar',
-            permission_classes=[IsAuthenticated])
+    @action(methods=['PUT'], detail=False, url_path='me/avatar')
     def avatar(self, request):
         serializer = AvatarSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         user = request.user
-
         user.avatar = serializer.validated_data.get('avatar')
         user.save()
 
         avatar_url = serializer.get_avatar_url(user)
-
         return Response({'avatar': avatar_url}, status=status.HTTP_200_OK)
 
     @avatar.mapping.delete
@@ -115,8 +114,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(methods=['POST'], detail=False, url_path='set_password',
-            permission_classes=[IsAuthenticated])
+    @action(methods=['POST'], detail=False, url_path='set_password')
     def set_password(self, request):
         serializer = SetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -125,7 +123,6 @@ class UserViewSet(viewsets.ModelViewSet):
         current_password = serializer.validated_data.get('current_password')
 
         user = request.user
-
         if not user.check_password(current_password):
             raise ValidationError('Invalid current password')
 
