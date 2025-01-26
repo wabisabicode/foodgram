@@ -273,13 +273,10 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         recipe_ingredients = []
 
         for ingredient_data in ingredients_data:
-            ingredient = get_object_or_404(
-                Ingredient, id=ingredient_data.get('id'))
-
             recipe_ingredients.append(
                 RecipeIngredient(
                     recipe=recipe,
-                    ingredient=ingredient,
+                    ingredient_id=ingredient_data.get('id'),
                     amount=ingredient_data.get('amount')
                 )
             )
