@@ -8,7 +8,7 @@ class IngredientFilter(filters.FilterSet):
 
     class Meta:
         model = Ingredient
-        fields = ['name']
+        fields = ('name',)
 
 
 class RecipeFilter(filters.FilterSet):
@@ -21,7 +21,7 @@ class RecipeFilter(filters.FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ['tags', 'is_favorited', 'is_in_shopping_cart']
+        fields = ('tags', 'is_favorited', 'is_in_shopping_cart')
 
     def filter_tags(self, queryset, name, value):
         tags = self.request.query_params.getlist('tags', [])
