@@ -273,15 +273,15 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 class RecipeShortURLSerializer(serializers.ModelSerializer):
     short_link = serializers.SerializerMethodField()
 
+    class Meta:
+        model = RecipeShortURL
+        fields = ('short_link',)
+
     def get_short_link(self, obj):
         request = self.context.get('request')
         base_path = request.build_absolute_uri('/')
         short_url = f'{base_path}s/' + obj.hash
         return short_url
-
-    class Meta:
-        model = RecipeShortURL
-        fields = ('short_link',)
 
 
 class CreatorSerializer(serializers.ModelSerializer):
