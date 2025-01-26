@@ -202,18 +202,17 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return list(unique_tags)
 
     def validate_ingredients(self, ingredients):
-
-        ingredient_id_list = []
+        unique_ingredient_ids = set()
 
         for ingredient in ingredients:
             ingredient_id = ingredient.get('id')
 
-            if ingredient_id in ingredient_id_list:
+            if ingredient_id in unique_ingredient_ids:
                 raise serializers.ValidationError(
                     {'ingredients': 'Ingredient should be provided only once'}
                 )
             else:
-                ingredient_id_list.append(ingredient_id)
+                unique_ingredient_ids.add(ingredient_id)
 
         return ingredients
 
