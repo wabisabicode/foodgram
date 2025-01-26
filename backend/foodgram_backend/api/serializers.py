@@ -192,13 +192,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         exclude = ('pub_date',)
 
     def validate_tags(self, tags):
-
-        for tag in tags:
-            if not Tag.objects.filter(id=tag.id).exists():
-                raise serializers.ValidationError(
-                    {'tags': f'Tag with id {tag.id} does not exist'}
-                )
-
         unique_tags = set(tags)
 
         if len(unique_tags) != len(tags):
