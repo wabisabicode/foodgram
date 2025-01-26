@@ -269,7 +269,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         read_serializer = RecipeReadSerializer(instance, context=self.context)
         return read_serializer.data
 
-    def create_ingredients(recipe, ingredients_data):
+    def create_ingredients(self, recipe, ingredients_data):
         recipe_ingredients = []
 
         for ingredient_data in ingredients_data:
