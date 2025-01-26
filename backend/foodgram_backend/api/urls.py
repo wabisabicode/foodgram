@@ -2,8 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from .views import (IngredientListRetrieveViewSet, RecipeViewSet,
-                    TagListRetrieveViewSet, UserViewSet,
-                    download_shopping_cart)
+                    TagListRetrieveViewSet, UserViewSet)
 
 app_name = 'api'
 
@@ -16,7 +15,5 @@ router_v1.register('recipes', RecipeViewSet, basename='recipes')
 
 urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
-    path('recipes/download_shopping_cart/',
-         download_shopping_cart, name='download-shopping-cart'),
     path('', include(router_v1.urls)),
 ]

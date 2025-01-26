@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
-from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
@@ -175,6 +175,32 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def toggle_shopping_cart_item(self, request, pk):
         return self.update_recipe_status(request, ShoppingCartItem, pk)
 
+    @action(methods=['GET'], detail=False, url_path='download_shopping_cart')
+    def download_shopping_cart(self, request):
+        ingredients = (
+            Ingredient.objects.filter(
+                recipes__shopping_cart_items__user=request.user)
+            .annotate(total_amount=Sum('recipeingredients__amount'))
+            .values('name', 'measurement_unit', 'total_amount')
+        )
+
+        shopping_list_items = '\n'.join(
+            f'{ingredient["name"]}: '
+            f'{ingredient["total_amount"]} '
+            f'{ingredient["measurement_unit"]}'
+            for ingredient in ingredients
+        )
+
+        return HttpResponse(
+            shopping_list_items,
+            headers={
+                "Content-Type": "text/plain",
+                "Content-Disposition": (
+                    'attachment; filename="shopping_list.txt"'
+                ),
+            },
+        )
+
     def update_recipe_status(self, request, model, pk):
         user = request.user
         recipe = get_object_or_404(self.get_queryset(), pk=pk)
@@ -197,29 +223,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
             if not deleted:
                 raise ValidationError('Recipe not in shopping cart')
             return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def download_shopping_cart(request):
-    ingredients = (
-        Ingredient.objects.filter(
-            recipes__shopping_cart_items__user=request.user)
-        .annotate(total_amount=Sum('recipeingredients__amount'))
-        .values('name', 'measurement_unit', 'total_amount')
-    )
-
-    shopping_list_items = '\n'.join(
-        f'{ingredient["name"]}: '
-        f'{ingredient["total_amount"]} '
-        f'{ingredient["measurement_unit"]}'
-        for ingredient in ingredients
-    )
-
-    return HttpResponse(
-        shopping_list_items,
-        headers={
-            "Content-Type": "text/plain",
-            "Content-Disposition": 'attachment; filename="shopping_list.txt"',
-        },
-    )
