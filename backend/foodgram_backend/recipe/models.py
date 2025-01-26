@@ -158,6 +158,3 @@ class ShoppingCartItem(models.Model):
             models.UniqueConstraint(fields=['user', 'recipe'],
                                     name='unique_recipe_in_users_cart'),
         ]
-
-    def __str__(self):
-        return self.name
