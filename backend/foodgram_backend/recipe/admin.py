@@ -21,14 +21,14 @@ class TagsIntermediateAdmin(admin.ModelAdmin):
 
 class RecipeIngredientInline(admin.TabularInline):
     model = RecipeIngredient
-    extra = 0
+    extra = 1
 
 
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('name', 'cooking_time_with_unit', 'author',
                     'favorites_count', 'tags_list', 'ingredients_list')
     readonly_fields = ('favorites_count',)
-    search_fields = ('name', 'author', 'tags')
+    search_fields = ('name', 'author__username', 'tags__name')
     list_filter = ('tags', 'author')
 
     inlines = (
@@ -49,14 +49,9 @@ class RecipeAdmin(admin.ModelAdmin):
         )
     ingredients_list.short_description = 'Ингредиенты'
 
+    @admin.display(description='Время приготовления (мин)')
     def cooking_time_with_unit(self, obj):
         return f'{obj.cooking_time}'
-    cooking_time_with_unit.short_description = 'Время приготовления (мин)'
-
-    # def save_model(self, request, obj, form, change):
-    #     if not obj.recipeingredients.exists():
-    #         raise ValidationError('Добавьте хотя бы один ингредиент')
-    #     super().save_model(request, obj, form, change)
 
 
 class IngredientAdmin(admin.ModelAdmin):
