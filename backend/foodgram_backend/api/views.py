@@ -175,10 +175,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def toggle_shopping_cart_item(self, request, pk):
         return self.toggle_parameter(request, ShoppingCartItem, pk)
 
-    def toggle_parameter(self, request, Model, pk):
+    def toggle_parameter(self, request, model, pk):
         user = request.user
         recipe = get_object_or_404(self.get_queryset(), pk=pk)
-        object = Model.objects.filter(user=user, recipe=recipe)
+        object = model.objects.filter(user=user, recipe=recipe)
 
         if request.method == 'POST':
             if object.exists():
@@ -187,7 +187,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            Model.objects.create(recipe=recipe, user=user)
+            model.objects.create(recipe=recipe, user=user)
             serializer = ShortRecipeSerializer(recipe)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
