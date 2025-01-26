@@ -243,7 +243,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
         recipe.tags.set(tags)
 
-        create_ingredients(recipe, ingredients_data)
+        self.create_ingredients(recipe, ingredients_data)
 
         recipe_short_url = RecipeShortURL.objects.create(recipe=recipe)
         recipe_short_url.generate_hash()
@@ -260,7 +260,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             instance.tags.set(tags_data)
 
         instance.recipeingredients.all().delete()
-        create_ingredients(instance, ingredients_data)
+        self.create_ingredients(instance, ingredients_data)
 
         instance.save()
         return instance
@@ -268,6 +268,23 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         read_serializer = RecipeReadSerializer(instance, context=self.context)
         return read_serializer.data
+
+    def create_ingredients(recipe, ingredients_data):
+        recipe_ingredients = []
+
+        for ingredient_data in ingredients_data:
+            ingredient = get_object_or_404(
+                Ingredient, id=ingredient_data.get('id'))
+
+            recipe_ingredients.append(
+                RecipeIngredient(
+                    recipe=recipe,
+                    ingredient=ingredient,
+                    amount=ingredient_data.get('amount')
+                )
+            )
+
+        RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
 
 class RecipeShortURLSerializer(serializers.ModelSerializer):
@@ -328,21 +345,3 @@ class CreatorSerializer(serializers.ModelSerializer):
                     'Invalid recipes_limit value')
 
         return data
-
-
-def create_ingredients(recipe, ingredients_data):
-    recipe_ingredients = []
-
-    for ingredient_data in ingredients_data:
-        ingredient = get_object_or_404(
-            Ingredient, id=ingredient_data.get('id'))
-
-        recipe_ingredients.append(
-            RecipeIngredient(
-                recipe=recipe,
-                ingredient=ingredient,
-                amount=ingredient_data.get('amount')
-            )
-        )
-
-    RecipeIngredient.objects.bulk_create(recipe_ingredients)
