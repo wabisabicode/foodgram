@@ -169,13 +169,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(methods=['POST', 'DELETE'], detail=True, url_path='favorite')
     def set_favorite(self, request, pk=None):
-        return self.toggle_parameter(request, Favorite, pk)
+        return self.update_recipe_status(request, Favorite, pk)
 
     @action(methods=['POST', 'DELETE'], detail=True, url_path='shopping_cart')
     def toggle_shopping_cart_item(self, request, pk):
-        return self.toggle_parameter(request, ShoppingCartItem, pk)
+        return self.update_recipe_status(request, ShoppingCartItem, pk)
 
-    def toggle_parameter(self, request, model, pk):
+    def update_recipe_status(self, request, model, pk):
         user = request.user
         recipe = get_object_or_404(self.get_queryset(), pk=pk)
         object = model.objects.filter(user=user, recipe=recipe)
