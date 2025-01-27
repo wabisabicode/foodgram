@@ -51,7 +51,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
     @admin.display(description='Время приготовления (мин)')
     def cooking_time_with_unit(self, obj):
-        return f'{obj.cooking_time}'
+        return obj.cooking_time
 
 
 class IngredientAdmin(admin.ModelAdmin):
