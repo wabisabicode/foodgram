@@ -10,13 +10,13 @@ RecipeTag = Recipe.tags.through
 class TagsIntermediateAdmin(admin.ModelAdmin):
     list_display = ('id', 'custom_recipe', 'custom_tag')
 
+    @admin.display(description='рецепт')
     def custom_recipe(self, obj):
         return obj.recipe.name
-    custom_recipe.short_description = 'рецепт'
 
+    @admin.display(description='тег')
     def custom_tag(self, obj):
         return obj.tag.name
-    custom_tag.short_description = 'тег'
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -39,15 +39,15 @@ class RecipeAdmin(admin.ModelAdmin):
     def favorites_count(self, obj):
         return obj.favorites.count()
 
+    @admin.display(description='Теги')
     def tags_list(self, obj):
-        return ', '.join([tag.name for tag in obj.tags.all()])
-    tags_list.short_description = 'Теги'
+        return ', '.join(obj.tags.values_list('name', flat=True))
 
+    @admin.display(description='Ингредиенты')
     def ingredients_list(self, obj):
         return ', '.join(
-            [ri.ingredient.name for ri in obj.recipeingredients.all()]
+            obj.recipeingredients.values_list('ingredient__name', flat=True)
         )
-    ingredients_list.short_description = 'Ингредиенты'
 
     @admin.display(description='Время приготовления (мин)')
     def cooking_time_with_unit(self, obj):
