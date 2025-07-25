@@ -2,7 +2,7 @@
 
 A social network for food lovers and everyone who enjoys cooking and eating with soul. 🧑‍🍳
 
-Visit the website at [foodgram.fintracker.com](https://foodgram.fintracker.com), register, and add recipes to your favorites, subscribe to other authors, and get your personalized shopping list from the recipes you like.
+Visit the website at [foodgram.fintracker.de](https://foodgram.fintracker.de), register, and add recipes to your favorites, subscribe to other authors, and get your personalized shopping list from the recipes you like.
 
 -----
 
