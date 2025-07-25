@@ -1,49 +1,62 @@
 # Foodgram
-Социальная сеть для гурманов и всех, кто любит душевно готовить и есть.
 
-Заходите на сайт [foodgram.fintracker.com](https://foodgram.fintracker.com), регистрируйтесь и добавляйте рецепты в избранное, подписывайтесь на других авторов и получите ваш индивидуальный список покупок из понравившихся рецептов.
+A social network for food lovers and everyone who enjoys cooking and eating with soul. 🧑‍🍳
 
-## Стек технологий
-При создании сайта использовались:
-- Django
-- Django REST Framework
-- Docker
-- nginx
-- React
+Visit the website at [foodgram.fintracker.com](https://foodgram.fintracker.com), register, and add recipes to your favorites, subscribe to other authors, and get your personalized shopping list from the recipes you like.
+
+-----
+
+## Technology Stack
+
+The following technologies were used to create this site:
+
+  * Django
+  * Django REST Framework
+  * Docker
+  * nginx
+  * React
+
+-----
 
 ## CI/CD
-Проект собирается из четырёх контейнеров:
+
+The project is built from four containers:
 backend, frontend, postgresql, nginx.
 
-Автоматическое тестирование при добавлении коммитов в основную ветку проекта и развёртывание на сервере прилагается. Подробнее на [GitHub проекта](https://github.com/wabisabicode/foodgram).
+Automatic testing is included when commits are added to the main project branch, along with deployment to the server. You can find more details on the project's [GitHub](https://github.com/wabisabicode/foodgram).
 
-## Локальное развертывание 
-Разработчики могут развернуть проект локально. Для этого необходимо перейти в директорию infra и развернуть docker compose:
+-----
+
+## Local Deployment
+
+Developers can deploy the project locally. To do this, navigate to the `infra` directory and run docker compose:
+
 ```
 cd infra && sudo docker compose up --build -d
 ```
 
-Проект будет доступен по локальному адресу http://127.0.0.1
+The project will be available at the local address [http://127.0.0.1](http://127.0.0.1)
 
-Для успешного запуска необходим файл `backend/.env`. Образец заполнения файла:
+For a successful launch, you need a `backend/.env` file. Here is a template for the file:
+
 ```
-# секретный ключ для Django
+# secret key for Django
 SECRET_KEY=
-# отладочный режим True/False
+# debug mode True/False
 DEBUG_MODE=
-# имя базы данных
+# database name
 POSTGRES_DB=
-# имя пользователя БД
+# DB username
 POSTGRES_USER=
-# пароль пользователя БД
+# DB user password
 POSTGRES_PASSWORD=
-# имя хоста БД - совпадает с названием сервиса БД в docker-compose.yml
+# DB hostname - must match the DB service name in docker-compose.yml
 DB_HOST=
-# порт соединения с БД
+# DB connection port
 DB_PORT=5432
 ```
 
-После успешного запуска контейнеров, необходимо в ручном режиме выполнить Django-миграции и собрать статику в контейнере `backend`.
+After the containers have started successfully, you need to manually run Django migrations and collect static files in the `backend` container.
 
 ```
 sudo docker compose exec backend python manage.py migrate
@@ -51,4 +64,4 @@ sudo docker compose exec backend python manage.py collectstatic
 sudo docker compose exec backend cp -r /app/foodgram_backend/collected_static/. /backend_static/static/
 ```
 
-После этого проект готов к локальной работе и тестированию.
+After this, the project is ready for local work and testing.
